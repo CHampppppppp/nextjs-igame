@@ -3,6 +3,24 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* 智能可视化主题色彩系统 */
+  --primary-blue: #2563eb;        /* 主色调 - 科技蓝 */
+  --secondary-indigo: #4f46e5;    /* 辅助色 - 靛蓝 */
+  --accent-blue-light: #60a5fa;     /* 强调色 - 浅蓝 */
+  --success-green: #10b981;        /* 成功色 - 翠绿 */
+  --warning-orange: #f59e0b;       /* 警告色 - 橙色 */
+
+  /* 背景系统 */
+  --bg-dark: #0f172a;             /* 深色背景 */
+  --bg-light: #f8fafc;           /* 浅色背景 */
+  --bg-glass: rgba(255, 255, 255, 0.1);  /* 毛玻璃效果 */
+
+  /* 渐变系统 */
+  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+  --gradient-secondary: linear-gradient(135deg, #e6f0ff 0%, #cfe7ff 100%);
+  --gradient-dark: linear-gradient(135deg, #f1f5f9 0%, #eaf2ff 100%);
+  --gradient-tech: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
 }
 
 @theme inline {
@@ -22,5 +40,90 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+/* 隐藏滚动条样式 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* 毛玻璃效果 */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 科技感卡片悬停效果 */
+.tech-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.tech-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* 渐变文字效果 */
+.gradient-text {
+  background: var(--gradient-tech);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 动画效果 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+/* 自定义滚动条样式（当需要显示时） */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+}
+
+/* 增强placeholder文字的可见度 */
+input::placeholder,
+textarea::placeholder {
+  color: #000000 !important; /* 使用纯黑色，提高对比度 */
+  opacity: 1 !important; /* 确保不透明度为1 */
+}
+
+/* 聚焦时placeholder颜色调整 */
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: #374151 !important; /* 聚焦时使用深灰色，仍然保持较高对比度 */
 }
