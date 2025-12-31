@@ -7,6 +7,55 @@ import { splitTextIntoChunks } from '@/lib/ai/embeddings';
 
 export async function POST(request: NextRequest) {
   try {
+    const contentType = request.headers.get('content-type') || '';
+    const pineconeEnabled = !!process.env.PINECONE_API_KEY;
+    const openaiKey = process.env.OPENAI_API_KEY;
+
+    if (contentType.includes('application/json')) {
+      const body = await request.json();
+      const text = (body?.text as string) || '';
+      const title = (body?.title as string) || '';
+      if (!text.trim()) {
+        return NextResponse.json(
+          { error: 'Text is required' },
+          { status: 400 }
+        );
+      }
+      if (!title.trim()) {
+        return NextResponse.json(
+          { error: 'Title is required' },
+          { status: 400 }
+        );
+      }
+      if (pineconeEnabled && !openaiKey) {
+        return NextResponse.json(
+          { error: 'OPENAI_API_KEY is not configured' },
+          { status: 400 }
+        );
+      }
+      const chunks = splitTextIntoChunks(text);
+      for (let i = 0; i < chunks.length; i++) {
+        const documentId = `${uuidv4()}_chunk_${i}`;
+        const memoryDoc: MemoryDocument = {
+          id: documentId,
+          content: chunks[i],
+          metadata: {
+            title,
+            type: 'manual',
+            createdAt: new Date().toISOString(),
+            fileName: '',
+            chunkIndex: i,
+            totalChunks: chunks.length
+          }
+        };
+        await ragSystem.addDocument(memoryDoc);
+      }
+      return NextResponse.json({
+        success: true,
+        message: `Text processed. Created ${chunks.length} document chunks.`,
+        chunksCount: chunks.length
+      });
+    }
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const title = formData.get('title') as string;
@@ -32,11 +81,11 @@ export async function POST(request: NextRequest) {
     let content = '';
 
     if (file.type === 'application/pdf') {
-      // PDF文件处理（需要pdf-parse包）
       try {
-        const pdfParse = (await import('pdf-parse')).default;
-        const data = await pdfParse(buffer);
-        content = data.text;
+        const mod = await import('pdf-parse');
+        const pdfParse: any = (mod as any).default ?? mod;
+        const data: any = await pdfParse(buffer);
+        content = data?.text || '';
       } catch (error) {
         console.error('PDF parsing error:', error);
         return NextResponse.json(
@@ -52,6 +101,13 @@ export async function POST(request: NextRequest) {
     if (!content.trim()) {
       return NextResponse.json(
         { error: 'File content is empty' },
+        { status: 400 }
+      );
+    }
+
+    if (pineconeEnabled && !openaiKey) {
+      return NextResponse.json(
+        { error: 'OPENAI_API_KEY is not configured' },
         { status: 400 }
       );
     }
@@ -93,8 +149,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Upload error:', error);
+    const message =
+      typeof error === 'object' && error && 'message' in error
+        ? String((error as any).message)
+        : String(error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: message || 'Internal server error' },
       { status: 500 }
     );
   }

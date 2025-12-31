@@ -18,6 +18,7 @@ export interface MemoryDocument {
 export class PineconeVectorStore {
   private pinecone: Pinecone;
   private indexName: string;
+  private embeddingDimension = 1536;
 
   constructor() {
     const apiKey = process.env.PINECONE_API_KEY;
@@ -32,8 +33,53 @@ export class PineconeVectorStore {
     this.indexName = process.env.PINECONE_INDEX_NAME || 'igame-lab-memory';
   }
 
+  private async ensureIndex(): Promise<void> {
+    const dimension = this.embeddingDimension;
+    const metric = 'cosine' as const;
+    const cloud = (process.env.PINECONE_CLOUD || 'aws') as 'aws' | 'gcp' | 'azure';
+    const region = process.env.PINECONE_REGION || 'us-east-1';
+
+    const indexes = await this.pinecone.listIndexes();
+    const existing = indexes.indexes?.find(i => i.name === this.indexName);
+    const exists = !!existing;
+    if (!exists) {
+      await this.pinecone.createIndex({
+        name: this.indexName,
+        dimension,
+        metric,
+        spec: {
+          serverless: {
+            cloud,
+            region,
+          },
+        },
+      });
+      await new Promise(res => setTimeout(res, 3000));
+    }
+    // 如果已存在但维度不匹配，直接抛出可读错误，避免后续 upsert/query 失败
+    const existingDim = (existing as any)?.dimension ?? (existing as any)?.spec?.dimension;
+    if (exists && typeof existingDim === 'number' && existingDim !== dimension) {
+      throw new Error(`Pinecone index dimension mismatch: expected ${dimension}, found ${existingDim}. Please recreate index or change PINECONE_INDEX_NAME.`);
+    }
+    await this.waitForIndexReady();
+  }
+
+  private async waitForIndexReady(): Promise<void> {
+    const index = this.pinecone.index(this.indexName);
+    const maxAttempts = 10;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        await index.describeIndexStats();
+        return;
+      } catch {
+        await new Promise(res => setTimeout(res, 1000));
+      }
+    }
+  }
+
   async addDocument(document: MemoryDocument): Promise<void> {
     try {
+      await this.ensureIndex();
       const index = this.pinecone.index(this.indexName);
 
       // 生成文档内容的向量嵌入
@@ -65,6 +111,7 @@ export class PineconeVectorStore {
 
   async searchRelevantDocuments(query: string, limit: number = 5): Promise<MemoryDocument[]> {
     try {
+      await this.ensureIndex();
       const index = this.pinecone.index(this.indexName);
 
       // 生成查询的向量嵌入
@@ -101,28 +148,48 @@ export class PineconeVectorStore {
 
   async getAllDocuments(): Promise<MemoryDocument[]> {
     try {
+      await this.ensureIndex();
       const index = this.pinecone.index(this.indexName);
 
-      // 获取所有向量（注意：这在生产环境中可能不是最佳实践，因为Pinecone没有直接的"获取所有"API）
-      // 这里我们使用一个大的topK值来模拟获取所有文档
-      const stats = await index.describeIndexStats();
-      const totalVectors = stats.totalVectorCount || 0;
+      let totalVectors = 0;
+      try {
+        const stats = await index.describeIndexStats();
+        const count = (stats as any).totalRecordCount;
+        totalVectors = typeof count === 'number' ? count : 0;
+      } catch {
+        totalVectors = 0;
+      }
 
       if (totalVectors === 0) {
         return [];
       }
 
-      // 使用一个零向量来获取所有文档（这不是最优的方法，但在Pinecone中没有直接的list all API）
-      const zeroVector = new Array(1536).fill(0); // text-embedding-3-small的维度是1536
+      // 读取索引维度，若不可读则回退到嵌入维度
+      let indexDimension = this.embeddingDimension;
+      try {
+        const indexes = await this.pinecone.listIndexes();
+        const existing = indexes.indexes?.find(i => i.name === this.indexName);
+        const dim = (existing as any)?.dimension ?? (existing as any)?.spec?.dimension;
+        if (typeof dim === 'number' && dim > 0) {
+          indexDimension = dim;
+        }
+      } catch {}
+      const zeroVector = new Array(indexDimension).fill(0);
 
-      const searchResponse = await index.query({
-        vector: zeroVector,
-        topK: Math.min(totalVectors, 10000), // 限制最大数量
-        includeMetadata: true,
-        includeValues: false,
-      });
+      let searchResponse;
+      try {
+        searchResponse = await index.query({
+          vector: zeroVector,
+          topK: Math.min(totalVectors, 10000),
+          includeMetadata: true,
+          includeValues: false,
+        });
+      } catch {
+        return [];
+      }
 
-      const documents: MemoryDocument[] = searchResponse.matches.map(match => ({
+      const matches = searchResponse.matches || [];
+      const documents: MemoryDocument[] = matches.map(match => ({
         id: match.id,
         content: match.metadata?.content as string || '',
         metadata: {
@@ -138,12 +205,13 @@ export class PineconeVectorStore {
       return documents;
     } catch (error) {
       console.error('Error getting all documents from Pinecone:', error);
-      throw error;
+      return [];
     }
   }
 
   async deleteDocument(documentId: string): Promise<void> {
     try {
+      await this.ensureIndex();
       const index = this.pinecone.index(this.indexName);
       await index.deleteOne(documentId);
       console.log(`Document ${documentId} deleted from Pinecone index`);

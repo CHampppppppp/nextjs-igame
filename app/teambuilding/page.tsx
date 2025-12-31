@@ -40,31 +40,6 @@ const activities = [
   }
 ];
 
-// 活动卡片组件
-function ActivityCard({ activity }: { activity: typeof activities[0] }) {
-  return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-video relative">
-        <Image
-          src={activity.image}
-          alt={activity.title}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-semibold text-gray-900">{activity.title}</h3>
-          <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-            {activity.date}
-          </span>
-        </div>
-        <p className="text-gray-600">{activity.description}</p>
-      </div>
-    </div>
-  );
-}
-
 // 统计数据
 const stats = [
   { label: "学术报告", value: "24场", icon: "🎤" },
@@ -72,17 +47,6 @@ const stats = [
   { label: "成员参与", value: "67人", icon: "👥" },
   { label: "活动覆盖", value: "100%", icon: "📊" }
 ];
-
-// 统计卡片组件
-function StatCard({ stat }: { stat: typeof stats[0] }) {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-      <div className="text-4xl mb-4">{stat.icon}</div>
-      <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-      <div className="text-gray-600">{stat.label}</div>
-    </div>
-  );
-}
 
 export default function TeamBuildingPage() {
   return (
@@ -107,9 +71,13 @@ export default function TeamBuildingPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">活动概况</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <StatCard key={index} stat={stat} />
+              <div key={index} className="text-center">
+                <div className="text-4xl mb-2">{stat.icon}</div>
+                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-gray-600">{stat.label}</div>
+              </div>
             ))}
           </div>
         </section>
@@ -121,22 +89,45 @@ export default function TeamBuildingPage() {
             <p className="text-lg text-gray-600">记录实验室精彩的团队活动瞬间</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {activities.map((activity, index) => (
-              <ActivityCard key={index} activity={activity} />
-            ))}
+          <div className="relative">
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 to-transparent"></div>
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 to-transparent"></div>
+            <div className="flex gap-8 overflow-x-auto snap-x snap-mandatory py-4">
+              {activities.map((activity, index) => (
+                <figure
+                  key={index}
+                  className="snap-start shrink-0 w-[80vw] md:w-[55vw] lg:w-[40vw] relative rounded-2xl overflow-hidden"
+                >
+                  <Image
+                    src={activity.image}
+                    alt={activity.title}
+                    width={1200}
+                    height={675}
+                    className="w-full h-[50vh] object-cover"
+                    priority={index === 0}
+                  />
+                  <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-white p-4">
+                    <div className="flex justify-between items-end">
+                      <h3 className="text-xl font-semibold">{activity.title}</h3>
+                      <span className="text-sm">{activity.date}</span>
+                    </div>
+                    <p className="text-sm opacity-90 mt-1">{activity.description}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* 活动理念 */}
-        <section className="bg-white rounded-lg shadow-md p-8">
+        <section className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">活动理念</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <span className="text-2xl">🤝</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">增进交流</h3>
@@ -144,7 +135,7 @@ export default function TeamBuildingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <span className="text-2xl">🎯</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">明确目标</h3>
@@ -152,7 +143,7 @@ export default function TeamBuildingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <span className="text-2xl">🚀</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">激发活力</h3>
