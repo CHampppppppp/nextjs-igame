@@ -1,14 +1,14 @@
 'use client';
 
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
-import ParticleBackground from "../components/effects/particle-background";
-import PhysicsPlayground from "../components/effects/physics-playground";
+// import ParticleBackground from "../components/effects/particle-background";
+// import PhysicsPlayground from "../components/effects/physics-playground";
 import { LayoutTransition } from "../components/layout/page-transition";
-import ScrollProgress, { BackToTopButton } from "../components/ui/scroll-progress";
+import { ScrollProgress } from "../components/ui/scroll-progress";
+import BackToTopButton from "../components/ui/back-to-top-button";
 import ChatWidget from "../components/ai/chat-widget";
 
 const geistSans = Geist({
@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col relative overflow-x-hidden`}
       >
         {/* 全局3D粒子背景 */}
-        <ParticleBackground />
+        {/* <ParticleBackground /> */}
 
         {/* 物理交互效果（可选择性启用） */}
         {/* <PhysicsPlayground isActive={false} /> */}

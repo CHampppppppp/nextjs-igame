@@ -4,7 +4,6 @@ import Image from "next/image";
 const researchDirections = [
   {
     title: "网格生成",
-    icon: "🔷",
     description: "网格生成是自主可控CAD/CAE工业软件研发的重要前处理步骤。课题组基于加权排序思想，提出了六面体网格的奇异结构简化方法，对解决六面体网格生成难题提供了新途径;提出了基于边界元与标架场的高质量四边结构网格自动生成方法、基于插值体细分的高阶网格生成方法，为解决结构化网格生成的自动化难题进行了有益探索。上述系列成果均发表在 CAD、CAGD 等本领域权威期刊上，并成功应用于国防基础科研核科学挑战专题项目以及国家数值风洞重大工程，为自主可控国产工业软件的研发做出了贡献。",
     keyPapers: [
       {
@@ -18,7 +17,6 @@ const researchDirections = [
   },
   {
     title: "等几何分析",
-    icon: "📐",
     description: "智能制造与虚拟现实是数字经济产业的重要组成部分。复杂产品的计算域高质量参数化则是困扰智能制造与虚拟现实中高精度仿真分析方法向前发展的关键瓶颈问题之一。课题组在国际上最早开始了这一问题的研究，开辟了'适合分析的计算域参数化'这一研究方向，研究了计算域参数化对等几何仿真模拟精度的影响，并定义了'适合分析的参数化'的评判度量；创新性地提出了约束优化、变分调和映射、边界重新参数化等一系列构造高质量计算域参数化的理论和方法，并解决了复杂拓扑平面区域的参数化难题, 为任意复杂计算域的参数化问题提供了基本框架, 从而为高精度仿真分析提供了重要几何基础，丰富了数字几何计算基础理论。",
     keyPapers: [
       {
@@ -32,7 +30,6 @@ const researchDirections = [
   },
   {
     title: "视觉与学习",
-    icon: "👁️",
     description: "主要研究深度学习在计算机视觉中的应用，并与计算机图形学技术相结合，涉及智能计算艺术、视频行为分析、艺术机器人等课题。课题组已在视觉质量评价与增强、图像生成与艺术风格迁移、视频人体检测与分析、虚拟试衣、绘画机器人等领域取得了丰硕成果。",
     keyPapers: [
       {
@@ -103,28 +100,26 @@ const researchProjects = [
 // 研究方向卡片组件
 function ResearchCard({ direction }: { direction: typeof researchDirections[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative h-48">
-        <Image
-          src={direction.image}
-          alt={direction.title}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <div className="p-8">
-        <div className="text-4xl mb-4">{direction.icon}</div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">{direction.title}</h3>
-        <p className="text-gray-600 mb-6 leading-relaxed">{direction.description}</p>
+    <div className="flex items-start gap-6 py-6 border-b border-gray-200">
+      <Image
+        src={direction.image}
+        alt={direction.title}
+        width={320}
+        height={200}
+        className="w-64 h-40 object-contain"
+      />
+      <div className="flex-1">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3">{direction.title}</h3>
+        <p className="text-gray-600 mb-4 leading-relaxed">{direction.description}</p>
 
         {direction.keyPapers && direction.keyPapers.length > 0 && (
-          <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-3">代表性论文：</h4>
-            <div className="space-y-3">
+          <div>
+            <h4 className="font-semibold text-gray-900 mb-2">代表性论文：</h4>
+            <div className="space-y-2">
               {direction.keyPapers.map((paper, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 mb-1">{paper.title}</p>
-                  <p className="text-xs text-gray-600 italic mb-1">{paper.authors}</p>
+                <div key={index} className="p-2">
+                  <p className="text-sm font-medium text-gray-900">{paper.title}</p>
+                  <p className="text-xs text-gray-600 italic">{paper.authors}</p>
                   <p className="text-xs text-blue-600">{paper.journal} ({paper.year})</p>
                 </div>
               ))}
@@ -153,7 +148,7 @@ function PaperCard({ paper }: { paper: typeof recentPapers[0] }) {
 // 项目卡片组件
 function ProjectCard({ project }: { project: typeof researchProjects[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
+    <div className="bg-white rounded-lg shadow-md p-6 border-2 border-blue-600">
       <h3 className="text-xl font-semibold text-gray-900 mb-2">{project.title}</h3>
       <p className="text-gray-600 mb-4">{project.description}</p>
       <div className="flex justify-between text-sm text-gray-500">
@@ -190,7 +185,7 @@ export default function ResearchPage() {
             <br /><br />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8">
             {researchDirections.map((direction, index) => (
               <ResearchCard key={index} direction={direction} />
             ))}

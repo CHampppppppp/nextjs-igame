@@ -57,15 +57,7 @@ const recruitmentInfo = {
   }
 };
 
-// 联系信息
-const contactInfo = {
-  address: "浙江省杭州市钱塘区下沙高教园区2号大街1158号，杭州电子科技大学",
-  labAddress: "实验室：第1教研楼，北530、606室",
-  officeAddress: "办公室：第1科研楼，北528室",
-  contact: "徐岗 教授",
-  emails: ["gxu@hdu.edu.cn", "xugangzju@gmail.com"],
-  website: "http://igame.hdu.edu.cn"
-};
+// 联系信息（侧边栏已移除）
 
 // 招聘卡片组件
 function RecruitmentCard({ info }: { info: typeof recruitmentInfo.faculty }) {
@@ -97,51 +89,7 @@ function CultureCard({ item }: { item: typeof recruitmentInfo.culture.items[0] }
   );
 }
 
-// 联系信息侧边栏组件
-function ContactSidebar() {
-  return (
-    <div className="bg-gray-50 rounded-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">联系信息</h2>
-
-      <div className="space-y-6">
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-geo-alt-fill mr-2 text-blue-600"></i>地址：
-          </h3>
-          <div className="text-gray-600 space-y-1">
-            <p>{contactInfo.address}</p>
-            <p><i className="bi bi-building mr-1"></i>{contactInfo.labAddress}</p>
-            <p><i className="bi bi-door-open-fill mr-1"></i>{contactInfo.officeAddress}</p>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-person-circle mr-2 text-blue-600"></i>联系人：
-          </h3>
-          <p className="text-gray-600">{contactInfo.contact}</p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-envelope mr-2 text-blue-600"></i>邮箱：
-          </h3>
-          <div className="space-y-1">
-            <p className="text-blue-600">Email1: {contactInfo.emails[0]}</p>
-            <p className="text-blue-600">Email2: {contactInfo.emails[1]}</p>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-globe mr-2 text-blue-600"></i>实验室网站：
-          </h3>
-          <p className="text-blue-600">{contactInfo.website}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+// 联系信息侧边栏已删除
 
 export default function ContactPage() {
   return (
@@ -159,9 +107,9 @@ export default function ContactPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8">
           {/* 主要内容区域 */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8">
             {/* 招聘信息区域 */}
             <section>
               <div className="text-center mb-8">
@@ -258,12 +206,7 @@ export default function ContactPage() {
             </section>
           </div>
 
-          {/* 侧边栏 */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <ContactSidebar />
-            </div>
-          </div>
+          {/* 侧边栏已移除 */}
         </div>
       </div>
     </div>

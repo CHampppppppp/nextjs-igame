@@ -228,10 +228,10 @@ export function StaggerContainer({
     >
       {Array.isArray(children)
         ? children.map((child, index) => (
-            <motion.div key={index} variants={itemVariants}>
-              {child}
-            </motion.div>
-          ))
+          <motion.div key={index} variants={itemVariants}>
+            {child}
+          </motion.div>
+        ))
         : children
       }
     </motion.div>
@@ -241,7 +241,7 @@ export function StaggerContainer({
 // 悬停效果组件
 export function HoverEffect({
   children,
-  scale = 1.05,
+  scale = 1.02,
   className = ''
 }: {
   children: ReactNode;

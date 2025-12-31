@@ -21,10 +21,10 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">友情链接</h3>
             <div className="space-y-2">
-              <a href="#" className="block text-gray-300 hover:text-white transition-colors">杭州电子科技大学</a>
-              <a href="#" className="block text-gray-300 hover:text-white transition-colors">通信工程学院</a>
-              <a href="#" className="block text-gray-300 hover:text-white transition-colors">研究生院</a>
-              <a href="#" className="block text-gray-300 hover:text-white transition-colors">科研管理系统</a>
+              <a href="http://www.hdu.edu.cn" className="block text-gray-300 hover:text-white transition-colors">杭州电子科技大学</a>
+              <a href="http://computer.hdu.edu.cn/" className="block text-gray-300 hover:text-white transition-colors">计算机学院</a>
+              <a href="http://grs.hdu.edu.cn/" className="block text-gray-300 hover:text-white transition-colors">研究生学院</a>
+              <a href="http://www.lib.hdu.edu.cn/" className="block text-gray-300 hover:text-white transition-colors">电子图书馆</a>
             </div>
           </div>
 
@@ -44,7 +44,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 iGame Lab - 智能可视化与仿真实验室. All rights reserved.</p>
+          <p>&copy; 2025 iGame Lab - 智能可视化与仿真实验室. All rights reserved.</p>
         </div>
       </div>
     </footer>

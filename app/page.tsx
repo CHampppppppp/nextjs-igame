@@ -250,13 +250,13 @@ function RecentPapers() {
           {papers.map((paper, index) => (
             <HoverEffect key={index}>
               <motion.div
-                className="bg-linear-to-br from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
+                className="bg-linear-to-br from-gray-50 to-blue-50 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50 h-full flex flex-col"
                 whileHover={{
-                  y: -8,
+                  y: -4,
                   transition: { type: 'spring', stiffness: 300, damping: 20 }
                 }}
               >
-                <div className="content-box">
+                <div className="content-box flex flex-col h-full">
                   <h3 className="text-lg font-bold mb-4 text-gray-900 leading-tight hover:text-blue-900 transition-colors">
                     {paper.title}
                   </h3>
@@ -271,7 +271,7 @@ function RecentPapers() {
                   </div>
                   {paper.impact && (
                     <motion.span
-                      className="inline-block px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white text-xs font-bold rounded-full shadow-md"
+                      className="inline-block px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white text-xs font-bold rounded-full shadow-md mt-auto"
                       whileHover={{ scale: 1.05 }}
                       transition={{ type: 'spring', stiffness: 400 }}
                     >
@@ -353,26 +353,48 @@ function TeamBuilding() {
     { title: "绍兴团建大禹陵合影", date: "2023-05", image: "/images/resource/news-4.jpg" }
   ];
 
+  // 复制一份数据用于无缝循环
+  const marqueeActivities = [...activities, ...activities];
+
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+    <section className="py-16 bg-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">团队建设</h2>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {activities.map((activity, index) => (
-            <div key={index} className="bg-gray-100 rounded-lg overflow-hidden shadow-md">
+      <div className="relative w-full">
+        <style jsx global>{`
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          .marquee-container {
+            width: max-content;
+            animation: scroll 40s linear infinite;
+          }
+          .marquee-container:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
+        
+        <div className="flex marquee-container">
+          {marqueeActivities.map((activity, index) => (
+            <div 
+              key={index} 
+              className="w-80 md:w-96 flex-shrink-0 mr-6 bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+            >
               <div className="relative h-48">
                 <Image
                   src={activity.image}
                   alt={activity.title}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 hover:scale-110"
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-gray-900">{activity.title}</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{activity.title}</h3>
                 <p className="text-sm text-gray-600">{activity.date}</p>
               </div>
             </div>
