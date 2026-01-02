@@ -315,7 +315,7 @@ function LatestNews() {
 // 欢迎加入我们组件 - 简约设计
 function JoinUs() {
   return (
-    <section className="py-24 bg-primary-charcoal text-white">
+    <section className="py-24 bg-primary-charcoal text-black">
       <div className="max-w-3xl mx-auto px-6 text-center">
         <ScrollReveal>
           <motion.h2
@@ -399,33 +399,56 @@ function TeamBuilding() {
 
   const [isPaused, setIsPaused] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
 
-  const scrollSpeed = 2; // 滚动速度
+  const scrollSpeed = 1.5; // 滚动速度（像素/帧）
   const pauseDuration = 2000; // 鼠标悬停时的暂停时间（毫秒）
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
-    const startAutoScroll = () => {
-      intervalRef.current = setInterval(() => {
+    const animate = (currentTime: number = 0) => {
+      if (!animationRef.current) return;
+
+      const deltaTime = currentTime - lastTimeRef.current;
+
+      // 控制帧率，大约60FPS
+      if (deltaTime >= 16.67) {
         if (!isPaused) {
+          // 平滑滚动，使用更小的增量
           scrollContainer.scrollLeft += scrollSpeed;
-          // 当滚动到末尾时，回到开始位置
-          if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth - scrollContainer.clientWidth) {
+
+          // 当滚动到末尾时，平滑回到开始位置
+          if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth - scrollContainer.clientWidth - 10) {
             scrollContainer.scrollLeft = 0;
           }
         }
-      }, 30);
+        lastTimeRef.current = currentTime;
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    const startAutoScroll = () => {
+      if (!animationRef.current) {
+        lastTimeRef.current = performance.now();
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    const stopAutoScroll = () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
     };
 
     startAutoScroll();
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      stopAutoScroll();
     };
   }, [isPaused]);
 
