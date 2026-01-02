@@ -5,15 +5,33 @@ export default function Footer() {
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Contact Info */}
+          {/* Contact Info (consolidated) */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">联系我们</h3>
+            <h3 className="text-lg font-semibold mb-4">联系信息</h3>
             <div className="space-y-2 text-gray-300">
-              <p>地址：杭州市钱塘新区白杨街道2号大街</p>
-              <p>杭州电子科技大学第1教研楼</p>
-              <p>联系人：徐岗教授</p>
-              <p>邮箱：gxu@hdu.edu.cn</p>
-              <p>xugangzju@gmail.com</p>
+              <p className="text-sm">
+                <strong>地址：</strong>浙江省杭州市钱塘区下沙高教园区2号大街1158号，杭州电子科技大学
+              </p>
+              <p className="text-sm">
+                <strong>实验室：</strong>第1教研楼，北530、606室
+              </p>
+              <p className="text-sm">
+                <strong>办公室：</strong>第1科研楼，北528室
+              </p>
+              <p className="text-sm">
+                <strong>联系人：</strong>徐岗 教授
+              </p>
+              <p className="text-sm">
+                <strong>邮箱：</strong>
+                <a href="mailto:gxu@hdu.edu.cn" className="ml-2 text-gray-200 hover:text-white">gxu@hdu.edu.cn</a>
+              </p>
+              <p className="text-sm">
+                <a href="mailto:xugangzju@gmail.com" className="text-gray-200 hover:text-white">xugangzju@gmail.com</a>
+              </p>
+              <p className="text-sm">
+                <strong>实验室网站：</strong>
+                <a href="http://igame.hdu.edu.cn" target="_blank" rel="noopener noreferrer" className="ml-2 text-gray-200 hover:text-white">igame.hdu.edu.cn</a>
+              </p>
             </div>
           </div>
 

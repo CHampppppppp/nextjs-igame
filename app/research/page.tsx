@@ -103,8 +103,8 @@ const researchProjects = [
 // 研究方向卡片组件
 function ResearchCard({ direction }: { direction: typeof researchDirections[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative h-48">
+    <div className="content-block p-6 rounded-xl">
+      <div className="relative h-44 rounded-lg overflow-hidden mb-6">
         <Image
           src={direction.image}
           alt={direction.title}
@@ -112,20 +112,20 @@ function ResearchCard({ direction }: { direction: typeof researchDirections[0] }
           className="object-cover"
         />
       </div>
-      <div className="p-8">
-        <div className="text-4xl mb-4">{direction.icon}</div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">{direction.title}</h3>
-        <p className="text-gray-600 mb-6 leading-relaxed">{direction.description}</p>
+      <div>
+        <div className="text-3xl mb-3">{direction.icon}</div>
+        <h3 className="text-xl font-semibold text-primary-charcoal mb-3 elegant-heading">{direction.title}</h3>
+        <p className="elegant-body mb-4">{direction.description}</p>
 
         {direction.keyPapers && direction.keyPapers.length > 0 && (
-          <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-3">代表性论文：</h4>
-            <div className="space-y-3">
+          <div className="mb-2">
+            <h4 className="font-medium text-secondary-slate mb-2">代表性论文：</h4>
+            <div className="space-y-2">
               {direction.keyPapers.map((paper, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 mb-1">{paper.title}</p>
-                  <p className="text-xs text-gray-600 italic mb-1">{paper.authors}</p>
-                  <p className="text-xs text-blue-600">{paper.journal} ({paper.year})</p>
+                <div key={index} className="p-3 rounded-md bg-white/40">
+                  <p className="text-sm font-medium text-primary-charcoal mb-1">{paper.title}</p>
+                  <p className="text-xs text-text-muted italic mb-1">{paper.authors}</p>
+                  <p className="text-xs text-accent-blue font-medium">{paper.journal} ({paper.year})</p>
                 </div>
               ))}
             </div>
@@ -139,12 +139,12 @@ function ResearchCard({ direction }: { direction: typeof researchDirections[0] }
 // 论文卡片组件
 function PaperCard({ paper }: { paper: typeof recentPapers[0] }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-6 hover:bg-white hover:shadow-md transition-all">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">{paper.title}</h3>
-      <p className="text-sm text-gray-600 mb-2">{paper.authors}</p>
+    <div className="content-block p-6 rounded-lg">
+      <h3 className="text-lg font-medium text-primary-charcoal mb-2">{paper.title}</h3>
+      <p className="text-sm text-text-muted mb-3">{paper.authors}</p>
       <div className="flex justify-between items-center text-sm">
-        <span className="text-blue-600">{paper.journal} ({paper.year})</span>
-        <span className="text-gray-500">引用: {paper.citations}</span>
+        <span className="text-accent-blue font-medium">{paper.journal} ({paper.year})</span>
+        <span className="text-text-muted">引用: {paper.citations}</span>
       </div>
     </div>
   );
@@ -153,10 +153,10 @@ function PaperCard({ paper }: { paper: typeof recentPapers[0] }) {
 // 项目卡片组件
 function ProjectCard({ project }: { project: typeof researchProjects[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{project.title}</h3>
-      <p className="text-gray-600 mb-4">{project.description}</p>
-      <div className="flex justify-between text-sm text-gray-500">
+    <div className="content-block p-6 rounded-lg border-l-4 border-accent-blue">
+      <h3 className="text-lg font-semibold text-primary-charcoal mb-2">{project.title}</h3>
+      <p className="text-text-muted mb-4">{project.description}</p>
+      <div className="flex justify-between text-sm text-text-muted">
         <span>研究周期: {project.period}</span>
         <span>资助金额: {project.funding}</span>
       </div>
@@ -166,28 +166,24 @@ function ProjectCard({ project }: { project: typeof researchProjects[0] }) {
 
 export default function ResearchPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-warm">
       {/* 页面标题 */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              <i className="bi bi-search mr-3"></i>研究课题 Research Topics
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              我们专注于网格生成、等几何分析、视觉与学习等前沿领域的研究，
-              致力于将基础研究与工业应用相结合。
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+          <h1 className="text-4xl font-bold text-primary-charcoal mb-4 elegant-heading">
+            <i className="bi bi-search mr-3 text-accent-blue"></i>研究课题
+          </h1>
+          <p className="text-lg elegant-subheading max-w-3xl mx-auto">
+            我们专注于网格生成、等几何分析、视觉与学习等前沿领域的研究，致力于将基础研究与工业应用相结合。
+          </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         {/* 研究课题区域 */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">研究课题 Research Topics</h2>
-            <br /><br />
+        <section className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="elegant-heading text-3xl mb-4">研究课题 Research Topics</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -198,10 +194,10 @@ export default function ResearchPage() {
         </section>
 
         {/* 近期论文区域 */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">近期论文</h2>
-            <p className="text-lg text-gray-600">实验室成员在国内外期刊发表的最新研究成果</p>
+        <section className="mb-12">
+          <div className="text-center mb-6">
+            <h2 className="elegant-heading text-3xl mb-4">近期论文</h2>
+            <p className="elegant-subheading">实验室成员在国内外期刊发表的最新研究成果</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -213,9 +209,9 @@ export default function ResearchPage() {
 
         {/* 研究项目区域 */}
         <section>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">研究项目</h2>
-            <p className="text-lg text-gray-600">实验室承担的国家和省部级科研项目</p>
+          <div className="text-center mb-6">
+            <h2 className="elegant-heading text-3xl mb-4">研究项目</h2>
+            <p className="elegant-subheading">实验室承担的国家和省部级科研项目</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

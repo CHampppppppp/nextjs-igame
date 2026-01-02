@@ -46,7 +46,7 @@ export const useScrollAnimation = (
     };
 
     const tl = animation(element);
-    tl.scrollTrigger = ScrollTrigger.create({
+    ScrollTrigger.create({
       ...scrollTriggerConfig,
       animation: tl,
     });

@@ -11,6 +11,56 @@ interface Message {
   timestamp: Date;
 }
 
+// 本地存储工具函数
+const STORAGE_KEY = 'chat_history';
+
+const saveChatHistory = (messages: Message[], sessionId: string | null) => {
+  try {
+    const data = {
+      messages: messages.map(msg => ({
+        ...msg,
+        timestamp: msg.timestamp.toISOString() // 转换为字符串存储
+      })),
+      sessionId,
+      lastUpdated: new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.warn('Failed to save chat history:', error);
+  }
+};
+
+const loadChatHistory = (): { messages: Message[], sessionId: string | null } => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return { messages: [], sessionId: null };
+
+    const parsed = JSON.parse(data);
+
+    // 转换时间戳回Date对象
+    const messages = parsed.messages.map((msg: any) => ({
+      ...msg,
+      timestamp: new Date(msg.timestamp)
+    }));
+
+    return {
+      messages,
+      sessionId: parsed.sessionId || null
+    };
+  } catch (error) {
+    console.warn('Failed to load chat history:', error);
+    return { messages: [], sessionId: null };
+  }
+};
+
+const clearChatHistory = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.warn('Failed to clear chat history:', error);
+  }
+};
+
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -19,10 +69,28 @@ export default function ChatWidget() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // 加载历史记录
+  useEffect(() => {
+    if (!isLoaded) {
+      const { messages: savedMessages, sessionId: savedSessionId } = loadChatHistory();
+      setMessages(savedMessages);
+      setSessionId(savedSessionId);
+      setIsLoaded(true);
+    }
+  }, [isLoaded]);
+
+  // 保存历史记录
+  useEffect(() => {
+    if (isLoaded) {
+      saveChatHistory(messages, sessionId);
+    }
+  }, [messages, sessionId, isLoaded]);
 
   useEffect(() => {
     scrollToBottom();
@@ -96,6 +164,18 @@ export default function ChatWidget() {
     }
   };
 
+  const startNewConversation = () => {
+    // 清除所有状态
+    setMessages([]);
+    setSessionId(null);
+    setInputValue('');
+
+    // 清除本地存储
+    clearChatHistory();
+
+    console.log('Started new conversation - cleared history and context');
+  };
+
   return (
     <>
       {/* 聊天按钮 */}
@@ -120,26 +200,46 @@ export default function ChatWidget() {
             className="fixed bottom-24 right-6 w-96 h-[32rem] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden"
           >
             {/* 头部 */}
-            <div className="bg-blue-600 text-white p-4 flex items-center justify-between rounded-t-2xl">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
+            <div className="bg-blue-600 text-white p-4 rounded-t-2xl">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">iGame Lab AI助手</h3>
+                    <p className="text-xs opacity-90">智能问答助手</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold">iGame Lab AI助手</h3>
-                  <p className="text-xs opacity-90">智能问答助手</p>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* 操作按钮 */}
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={startNewConversation}
+                  className="flex items-center space-x-1 text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-3 py-1 text-sm transition-colors"
+                  title="开启新对话"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>新对话</span>
+                </button>
+
+                <div className="text-xs opacity-75">
+                  {messages.length > 0 ? `${messages.length} 条消息` : '暂无消息'}
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
 
             {/* 消息区域 */}

@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "create-pinecone-index": "tsx scripts/create-pinecone-index.ts",
+    "init-db": "tsx scripts/init-database.ts",
+    "setup-db": "bash scripts/setup-database.sh",
+    "setup-demo": "bash setup-demo.sh"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.1",
@@ -17,14 +21,16 @@
     "@types/three": "^0.182.0",
     "@types/uuid": "^10.0.0",
     "ai": "^6.0.3",
-    "chromadb": "^3.2.0",
     "dotenv": "^17.2.3",
+    "formdata-node": "^6.0.3",
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
     "langchain": "^1.2.3",
     "matter-js": "^0.20.0",
     "multer": "^2.0.2",
+    "mysql2": "^3.16.0",
     "next": "16.1.1",
+    "node-fetch": "^3.3.2",
     "pdf-parse": "^2.4.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -36,6 +42,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/matter-js": "^0.20.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

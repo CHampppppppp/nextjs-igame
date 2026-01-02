@@ -108,12 +108,13 @@ export const interactionAnimations = {
 
   // 磁性效果（鼠标跟随）
   magneticEffect: (element: Element, strength: number = 0.3) => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: Event) => {
+      const mouseEvent = e as MouseEvent;
       const rect = element.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - centerX;
-      const deltaY = e.clientY - centerY;
+      const deltaX = mouseEvent.clientX - centerX;
+      const deltaY = mouseEvent.clientY - centerY;
 
       gsap.to(element, {
         x: deltaX * strength,
@@ -211,7 +212,7 @@ export const textAnimations = {
   },
 
   // 文字渐显效果
-  textReveal: (element: Element) => {
+  textReveal: (element: HTMLElement) => {
     const text = element.textContent || '';
     element.textContent = '';
     element.style.opacity = '1';

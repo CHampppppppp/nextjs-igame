@@ -136,8 +136,14 @@ export const detectIntent: ToolFunction = {
       const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1';
 
       if (!deepseekApiKey) {
-        // 如果没有 DeepSeek API，使用简单的关键词匹配作为后备
-        return fallbackIntentDetection(args.message);
+        // 如果没有 DeepSeek API，返回保守的默认意图
+        console.warn('DeepSeek API key not configured, returning default intent');
+        return {
+          success: false,
+          intent: 'general',
+          confidence: 0.5,
+          error: 'AI model not available for intent detection'
+        };
       }
 
       const apiUrl = `${deepseekBaseUrl}/chat/completions`;
@@ -156,11 +162,14 @@ export const detectIntent: ToolFunction = {
               content: `你是一个意图判断助手。请分析用户的问题，判断其意图类型。
 
 意图类型：
-1. "lab_related" - 与iGame实验室相关的问题（成员、研究方向、项目、论文、活动等）
+1. "lab_related" - 与iGame实验室相关的问题（成员、研究方向、项目、论文、活动、历史事件等）
 2. "time_query" - 询问当前时间、日期的问题
-3. "general" - 其他一般性问题
+3. "historical_time_query" - 询问过去的历史事件或时间相关问题（如"去年圣诞节发生了什么"）
+4. "general" - 其他一般性问题
 
 iGame实验室是智能可视化与仿真实验室，属于杭州电子科技大学计算机学院。主要研究方向包括：计算机辅助设计与仿真、等几何分析、计算机视觉、机器学习。
+
+实验室成员包括：徐岗教授（负责人）、高飞、顾仁树、邬海燕、徐金兰、许佳敏、肖州方、徐钢等老师。
 
 时间查询示例：
 - 现在几点了？
@@ -168,8 +177,21 @@ iGame实验室是智能可视化与仿真实验室，属于杭州电子科技大
 - 当前时间是什么？
 - 现在是什么日期？
 
+历史时间查询示例：
+- 去年圣诞节发生了什么？
+- 上次活动是什么时候？
+- 以前有什么新闻？
+- 过去发生了什么事情？
+- 许佳敏老师去年做了什么？
+
+实验室相关问题示例：
+- 实验室有多少人？
+- 徐岗教授的研究方向是什么？
+- 许佳敏老师最近在做什么？
+- 实验室的最新活动是什么？
+
 请根据用户问题判断意图类型，只返回JSON格式：
-{"intent": "lab_related"} 或 {"intent": "time_query"} 或 {"intent": "general"}`
+{"intent": "lab_related"} 或 {"intent": "time_query"} 或 {"intent": "historical_time_query"} 或 {"intent": "general"}`
             },
             {
               role: 'user',
@@ -203,38 +225,27 @@ iGame实验室是智能可视化与仿真实验室，属于杭州电子科技大
           confidence: parsed.confidence || 0.8
         };
       } catch (parseError) {
-        // 如果解析失败，使用后备方法
-        return fallbackIntentDetection(args.message);
+        // 如果解析失败，返回保守的默认意图
+        console.warn('Failed to parse DeepSeek response, returning default intent:', parseError);
+        return {
+          success: false,
+          intent: 'general',
+          confidence: 0.5,
+          error: 'Failed to parse AI response'
+        };
       }
     } catch (error) {
-      console.warn('DeepSeek intent detection failed, using fallback:', error);
-      return fallbackIntentDetection(args.message);
+      console.warn('DeepSeek intent detection failed, returning default intent:', error);
+      return {
+        success: false,
+        intent: 'general',
+        confidence: 0.5,
+        error: 'AI model request failed'
+      };
     }
   }
 };
 
-// 后备意图检测方法（关键词匹配）
-function fallbackIntentDetection(message: string): { success: boolean; intent: string; confidence: number } {
-  const labKeywords = [
-    'igame', '实验室', '教授', '徐岗', '计算机辅助设计', '等几何分析',
-    '计算机视觉', '机器学习', '研究生', '博士', '研究', '项目',
-    '论文', '学术', '活动', '新闻', '杭州电子科技大学', '计算机学院',
-    '可视化', '仿真', '团队', '成员', '负责人', '规模'
-  ];
-
-  const lowerMessage = message.toLowerCase();
-  const matchedKeywords = labKeywords.filter(keyword =>
-    lowerMessage.includes(keyword.toLowerCase())
-  );
-
-  const confidence = Math.min(matchedKeywords.length * 0.2, 1.0);
-
-  return {
-    success: true,
-    intent: confidence > 0.3 ? 'lab_related' : 'general',
-    confidence
-  };
-}
 
 // 可用的工具函数列表
 export const availableTools: ToolFunction[] = [

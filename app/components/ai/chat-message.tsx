@@ -58,8 +58,10 @@ export default function ChatMessage({ message, isTyping = false }: ChatMessagePr
               rehypePlugins={[rehypeHighlight]}
               components={{
                 p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                code: ({ inline, children, ...props }) => (
-                  inline ? (
+                code: ({ children, ...props }) => {
+                  // 检查是否是行内代码（通过className或其他方式判断）
+                  const isInline = !props.className?.includes('language-');
+                  return isInline ? (
                     <code className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-xs font-mono" {...props}>
                       {children}
                     </code>
@@ -67,8 +69,8 @@ export default function ChatMessage({ message, isTyping = false }: ChatMessagePr
                     <code className="block bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto my-2 font-mono text-sm" {...props}>
                       {children}
                     </code>
-                  )
-                ),
+                  );
+                },
                 pre: ({ children }) => <div className="my-2">{children}</div>,
                 ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
                 ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
@@ -99,8 +101,10 @@ export default function ChatMessage({ message, isTyping = false }: ChatMessagePr
               rehypePlugins={[rehypeHighlight]}
               components={{
                 p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                code: ({ inline, children, ...props }) => (
-                  inline ? (
+                code: ({ children, ...props }: any) => {
+                  // 检查是否是行内代码（通过className或其他方式判断）
+                  const isInline = !props.className?.includes('language-');
+                  return isInline ? (
                     <code className="bg-gray-700 text-gray-100 px-1 py-0.5 rounded text-xs font-mono" {...props}>
                       {children}
                     </code>
@@ -108,8 +112,8 @@ export default function ChatMessage({ message, isTyping = false }: ChatMessagePr
                     <code className="block bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto my-2 font-mono text-sm" {...props}>
                       {children}
                     </code>
-                  )
-                ),
+                  );
+                },
                 pre: ({ children }) => <div className="my-2">{children}</div>,
                 ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
                 ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,

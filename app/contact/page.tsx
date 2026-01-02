@@ -70,13 +70,13 @@ const contactInfo = {
 // 招聘卡片组件
 function RecruitmentCard({ info }: { info: typeof recruitmentInfo.faculty }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">{info.title}</h2>
+    <div className="content-block p-6 rounded-lg">
+      <h2 className="text-2xl font-semibold text-primary-charcoal mb-4">{info.title}</h2>
       <div className="space-y-4">
         {info.requirements.map((req, index) => (
-          <div key={index} className="border-b border-gray-100 pb-4 last:border-b-0">
-            <h3 className="font-semibold text-gray-900 mb-2">{req.label}：</h3>
-            <p className="text-gray-600">{req.content}</p>
+          <div key={index} className="border-b border-text-muted/20 pb-4 last:border-b-0">
+            <h3 className="font-medium text-primary-charcoal mb-2">{req.label}：</h3>
+            <p className="text-text-muted">{req.content}</p>
           </div>
         ))}
       </div>
@@ -87,108 +87,62 @@ function RecruitmentCard({ info }: { info: typeof recruitmentInfo.faculty }) {
 // 培养制度卡片组件
 function CultureCard({ item }: { item: typeof recruitmentInfo.culture.items[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="content-block p-6 rounded-lg">
       <div className="flex items-center mb-4">
         <span className="text-3xl mr-4">{item.icon}</span>
-        <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
+        <h3 className="text-xl font-semibold text-primary-charcoal">{item.title}</h3>
       </div>
-      <p className="text-gray-600">{item.content}</p>
+      <p className="text-text-muted">{item.content}</p>
     </div>
   );
 }
 
-// 联系信息侧边栏组件
-function ContactSidebar() {
-  return (
-    <div className="bg-gray-50 rounded-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">联系信息</h2>
-
-      <div className="space-y-6">
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-geo-alt-fill mr-2 text-blue-600"></i>地址：
-          </h3>
-          <div className="text-gray-600 space-y-1">
-            <p>{contactInfo.address}</p>
-            <p><i className="bi bi-building mr-1"></i>{contactInfo.labAddress}</p>
-            <p><i className="bi bi-door-open-fill mr-1"></i>{contactInfo.officeAddress}</p>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-person-circle mr-2 text-blue-600"></i>联系人：
-          </h3>
-          <p className="text-gray-600">{contactInfo.contact}</p>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-envelope mr-2 text-blue-600"></i>邮箱：
-          </h3>
-          <div className="space-y-1">
-            <p className="text-blue-600">Email1: {contactInfo.emails[0]}</p>
-            <p className="text-blue-600">Email2: {contactInfo.emails[1]}</p>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-            <i className="bi bi-globe mr-2 text-blue-600"></i>实验室网站：
-          </h3>
-          <p className="text-blue-600">{contactInfo.website}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+// (ContactSidebar removed — contact info consolidated into Footer)
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-warm">
       {/* 页面标题 */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">联系我们</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              欢迎优秀的您加入iGame Lab，我们期待与您共同探索前沿技术。
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+          <h1 className="text-4xl font-bold text-primary-charcoal mb-4 elegant-heading">联系我们</h1>
+          <p className="text-lg elegant-subheading max-w-3xl mx-auto">
+            欢迎优秀的您加入iGame Lab，我们期待与您共同探索前沿技术。
+          </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 gap-8">
           {/* 主要内容区域 */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8">
             {/* 招聘信息区域 */}
             <section>
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">招聘信息</h2>
+              <div className="text-center mb-6">
+                <h2 className="elegant-heading text-3xl mb-4">招聘信息</h2>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-6">
                 <RecruitmentCard info={recruitmentInfo.faculty} />
                 <RecruitmentCard info={recruitmentInfo.graduate} />
 
                 {/* 人才培养制度 */}
-                <div className="bg-white rounded-lg shadow-md p-8">
-                  <div className="inner-title mb-6 flex items-center">
-                    <i className="bi bi-people mr-3 text-blue-600 text-2xl"></i>
-                    <h3 className="text-2xl font-bold text-gray-900">人才培养</h3>
+                <div className="content-block rounded-lg p-6">
+                  <div className="inner-title mb-4 flex items-center">
+                    <i className="bi bi-people mr-3 text-accent-blue text-2xl"></i>
+                    <h3 className="text-2xl font-semibold text-primary-charcoal">人才培养</h3>
                   </div>
-                  <div className="text text-gray-600 space-y-4">
+                  <div className="text-text-muted space-y-3">
                     {recruitmentInfo.culture.items.map((item, index) => (
-                      <div key={index} className="mb-6">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                      <div key={index} className="mb-4">
+                        <h4 className="font-medium text-primary-charcoal mb-2 flex items-center">
                           <span className="text-2xl mr-2">{item.icon}</span>
                           {item.title}
                         </h4>
-                        <ul className="space-y-2 ml-8">
+                        <ul className="space-y-2 ml-6 text-text-muted">
                           {item.content.split('；').filter(s => s.trim()).map((point, idx) => (
                             <li key={idx} className="flex items-start">
-                              <i className="bi bi-speedometer2 mr-2 mt-1 text-blue-600"></i>
+                              <i className="bi bi-speedometer2 mr-2 mt-1 text-accent-blue"></i>
                               <span>{point.trim()}</span>
                             </li>
                           ))}
@@ -202,8 +156,8 @@ export default function ContactPage() {
 
             {/* 人才培养制度区域 */}
             <section>
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">人才培养制度</h2>
+              <div className="text-center mb-6">
+                <h2 className="elegant-heading text-3xl mb-4">人才培养制度</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -214,42 +168,42 @@ export default function ContactPage() {
             </section>
 
             {/* 申请方式 */}
-            <section className="bg-blue-600 text-white rounded-lg p-8">
+            <section className="content-block rounded-lg p-6">
               <div className="text-center">
-                <h2 className="text-3xl font-bold mb-6">申请方式</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <h2 className="text-3xl font-semibold mb-6">申请方式</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">📧</span>
                     </div>
-                    <h3 className="font-semibold mb-2">发送简历</h3>
-                    <p className="text-sm">将简历发送至实验室邮箱</p>
+                    <h3 className="font-medium mb-2">发送简历</h3>
+                    <p className="text-sm text-text-muted">将简历发送至实验室邮箱</p>
                   </div>
 
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">💬</span>
                     </div>
-                    <h3 className="font-semibold mb-2">联系导师</h3>
-                    <p className="text-sm">直接与意向导师取得联系</p>
+                    <h3 className="font-medium mb-2">联系导师</h3>
+                    <p className="text-sm text-text-muted">直接与意向导师取得联系</p>
                   </div>
 
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">🏫</span>
                     </div>
-                    <h3 className="font-semibold mb-2">学校招生</h3>
-                    <p className="text-sm">参加学校研究生统一招生</p>
+                    <h3 className="font-medium mb-2">学校招生</h3>
+                    <p className="text-sm text-text-muted">参加学校研究生统一招生</p>
                   </div>
                 </div>
 
                 <div className="text-center">
-                  <p className="text-lg mb-6">
+                  <p className="text-lg text-primary-charcoal mb-4">
                     我们期待您的加入，共同创造美好的未来！
                   </p>
                   <Link
                     href="/"
-                    className="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    className="accent-button"
                   >
                     返回主页
                   </Link>
@@ -258,12 +212,7 @@ export default function ContactPage() {
             </section>
           </div>
 
-          {/* 侧边栏 */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <ContactSidebar />
-            </div>
-          </div>
+          {/* 侧边栏 已移除，联系信息已整合到页脚 */}
         </div>
       </div>
     </div>

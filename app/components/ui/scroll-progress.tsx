@@ -5,8 +5,8 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 export default function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 60,  // 降低刚度，使动画更柔和
+    damping: 25,    // 调整阻尼，减少振荡
     restDelta: 0.001
   });
 
@@ -22,8 +22,8 @@ export default function ScrollProgress() {
 export function CircularScrollProgress() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 60,  // 降低刚度
+    damping: 25,    // 调整阻尼
     restDelta: 0.001
   });
 
@@ -86,22 +86,34 @@ export function CircularScrollProgress() {
 export function BackToTopButton() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 60,  // 降低刚度
+    damping: 25,    // 调整阻尼
     restDelta: 0.001
   });
 
   const scrollToTop = () => {
-    // 使用更平滑的滚动动画
-    const scrollDuration = 1000; // 1秒滚动时间
-    const scrollStep = -window.scrollY / (scrollDuration / 15);
-    const scrollInterval = setInterval(() => {
-      if (window.scrollY !== 0) {
-        window.scrollBy(0, scrollStep);
-      } else {
-        clearInterval(scrollInterval);
+    // 使用更平滑和稳定的滚动动画
+    const scrollDuration = 800; // 稍微缩短滚动时间
+    const scrollStep = -window.scrollY / (scrollDuration / 16); // 更小的步长
+    let startTime: number | null = null;
+
+    const smoothScroll = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / scrollDuration, 1);
+
+      // 使用缓动函数使动画更自然
+      const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const easedProgress = easeInOutCubic(progress);
+
+      window.scrollTo(0, window.scrollY * (1 - easedProgress));
+
+      if (progress < 1) {
+        requestAnimationFrame(smoothScroll);
       }
-    }, 15);
+    };
+
+    requestAnimationFrame(smoothScroll);
   };
 
   return (

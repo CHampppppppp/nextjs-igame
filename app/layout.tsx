@@ -5,11 +5,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
-import ParticleBackground from "../components/effects/particle-background";
-import PhysicsPlayground from "../components/effects/physics-playground";
-import { LayoutTransition } from "../components/layout/page-transition";
-import ScrollProgress, { BackToTopButton } from "../components/ui/scroll-progress";
-import ChatWidget from "../components/ai/chat-widget";
+import AdvancedCanvasBackground from "./components/effects/advanced-canvas-background";
+import PhysicsPlayground from "./components/effects/physics-playground";
+import { LayoutTransition } from "./components/layout/page-transition";
+import ScrollProgress, { BackToTopButton } from "./components/ui/scroll-progress";
+import ChatWidget from "./components/ai/chat-widget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,8 +31,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col relative overflow-x-hidden`}
       >
-        {/* 全局3D粒子背景 */}
-        <ParticleBackground />
+        {/* 高级Canvas背景 */}
+        <AdvancedCanvasBackground />
 
         {/* 物理交互效果（可选择性启用） */}
         {/* <PhysicsPlayground isActive={false} /> */}

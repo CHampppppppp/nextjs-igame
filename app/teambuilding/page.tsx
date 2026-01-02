@@ -43,8 +43,8 @@ const activities = [
 // 活动卡片组件
 function ActivityCard({ activity }: { activity: typeof activities[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-video relative">
+    <div className="content-block overflow-hidden rounded-xl">
+      <div className="aspect-video relative rounded-md overflow-hidden">
         <Image
           src={activity.image}
           alt={activity.title}
@@ -54,12 +54,12 @@ function ActivityCard({ activity }: { activity: typeof activities[0] }) {
       </div>
       <div className="p-6">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-semibold text-gray-900">{activity.title}</h3>
-          <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+          <h3 className="text-lg font-semibold text-primary-charcoal">{activity.title}</h3>
+          <span className="text-sm text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-full">
             {activity.date}
           </span>
         </div>
-        <p className="text-gray-600">{activity.description}</p>
+        <p className="text-text-muted">{activity.description}</p>
       </div>
     </div>
   );
@@ -76,38 +76,35 @@ const stats = [
 // 统计卡片组件
 function StatCard({ stat }: { stat: typeof stats[0] }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-      <div className="text-4xl mb-4">{stat.icon}</div>
-      <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-      <div className="text-gray-600">{stat.label}</div>
+    <div className="content-block p-6 text-center rounded-lg">
+      <div className="text-3xl mb-3">{stat.icon}</div>
+      <div className="text-2xl font-semibold text-primary-charcoal mb-1">{stat.value}</div>
+      <div className="text-text-muted">{stat.label}</div>
     </div>
   );
 }
 
 export default function TeamBuildingPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-warm">
       {/* 页面标题 */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">团队建设</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              除了学术研究，我们重视团队建设和文化建设，
-              通过各类活动增进成员之间的交流与合作。
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+          <h1 className="text-4xl font-bold text-primary-charcoal mb-4 elegant-heading">团队建设</h1>
+          <p className="text-lg elegant-subheading max-w-3xl mx-auto">
+            除了学术研究，我们重视团队建设和文化建设，通过各类活动增进成员之间的交流与合作。
+          </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         {/* 活动统计 */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">活动概况</h2>
+        <section className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="elegant-heading text-3xl mb-4">活动概况</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
               <StatCard key={index} stat={stat} />
             ))}
@@ -115,10 +112,10 @@ export default function TeamBuildingPage() {
         </section>
 
         {/* 活动图片展示 */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">活动掠影</h2>
-            <p className="text-lg text-gray-600">记录实验室精彩的团队活动瞬间</p>
+        <section className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="elegant-heading text-3xl mb-4">活动掠影</h2>
+            <p className="elegant-subheading">记录实验室精彩的团队活动瞬间</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -129,34 +126,34 @@ export default function TeamBuildingPage() {
         </section>
 
         {/* 活动理念 */}
-        <section className="bg-white rounded-lg shadow-md p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">活动理念</h2>
+        <section className="content-block rounded-lg p-8">
+          <div className="text-center mb-6">
+            <h2 className="elegant-heading text-3xl mb-4">活动理念</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-accent-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🤝</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">增进交流</h3>
-              <p className="text-gray-600">通过各类活动促进成员之间的交流，增进感情</p>
+              <h3 className="text-xl font-semibold text-primary-charcoal mb-2">增进交流</h3>
+              <p className="text-text-muted">通过各类活动促进成员之间的交流，增进感情</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-accent-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎯</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">明确目标</h3>
-              <p className="text-gray-600">明确团队发展目标，统一发展方向</p>
+              <h3 className="text-xl font-semibold text-primary-charcoal mb-2">明确目标</h3>
+              <p className="text-text-muted">明确团队发展目标，统一发展方向</p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-accent-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🚀</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">激发活力</h3>
-              <p className="text-gray-600">激发团队活力，提升工作效率和创新能力</p>
+              <h3 className="text-xl font-semibold text-primary-charcoal mb-2">激发活力</h3>
+              <p className="text-text-muted">激发团队活力，提升工作效率和创新能力</p>
             </div>
           </div>
         </section>

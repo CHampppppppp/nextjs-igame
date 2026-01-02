@@ -7,9 +7,9 @@ import { motion } from 'framer-motion';
 // 物理世界配置
 const PhysicsPlayground = ({ isActive = true }: { isActive?: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<Matter.Engine>();
-  const renderRef = useRef<Matter.Render>();
-  const runnerRef = useRef<Matter.Runner>();
+  const engineRef = useRef<Matter.Engine | null>(null);
+  const renderRef = useRef<Matter.Render | null>(null);
+  const runnerRef = useRef<Matter.Runner | null>(null);
   const [bodies, setBodies] = useState<Matter.Body[]>([]);
 
   useEffect(() => {
@@ -134,7 +134,7 @@ const PhysicsPlayground = ({ isActive = true }: { isActive?: boolean }) => {
       if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
       if (renderRef.current) Matter.Render.stop(renderRef.current);
       if (engineRef.current) Matter.World.clear(engineRef.current.world, false);
-      if (renderRef.current.canvas?.parentNode) {
+      if (renderRef.current && renderRef.current.canvas && renderRef.current.canvas.parentNode) {
         renderRef.current.canvas.parentNode.removeChild(renderRef.current.canvas);
       }
     };

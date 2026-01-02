@@ -102,10 +102,8 @@ igame-lab-next/
 │   ├── ai/                      # AI相关工具
 │   │   ├── chat.ts              # 聊天逻辑
 │   │   ├── embeddings.ts        # 向量嵌入
-│   │   ├── chroma-client.ts     # ChromaDB 客户端
 │   │   └── rag-chain.ts         # RAG 链配置
 │   ├── db/                      # 数据库配置
-│   │   ├── chroma.ts            # ChromaDB 配置
 │   │   └── schema.ts            # 数据模式
 │   ├── utils/                   # 通用工具
 │   │   ├── cn.ts                # 类名合并工具
@@ -283,7 +281,6 @@ igame-lab-next/
 NEXT_PUBLIC_SITE_URL=https://igame-lab.dasusm.com
 DEEPSEEK_API_KEY=your_deepseek_api_key
 OPENAI_API_KEY=your_openai_api_key_for_embeddings
-CHROMA_DB_PATH=./data/chroma
 REDIS_URL=redis://localhost:6379  # 可选
 ```
 

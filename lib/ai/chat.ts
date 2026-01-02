@@ -1,23 +1,61 @@
+/**
+ * AI聊天服务模块
+ * 负责处理用户消息、意图识别、RAG检索和AI回复生成
+ *
+ * 主要功能：
+ * - 多意图消息处理（时间查询、实验室问题、一般对话）
+ * - 集成RAG系统进行知识检索
+ * - 会话管理和消息历史
+ * - OpenAI API调用和响应处理
+ */
+
 import { ragSystem } from './rag-chain';
 import { getToolByName } from './tools';
 
+/**
+ * 聊天消息接口
+ */
 export interface ChatMessage {
+  /** 消息唯一ID */
   id: string;
+  /** 消息角色：用户或助手 */
   role: 'user' | 'assistant';
+  /** 消息内容 */
   content: string;
+  /** 消息时间戳 */
   timestamp: Date;
 }
 
+/**
+ * 聊天会话接口
+ * 表示一次完整的对话会话
+ */
 export interface ChatSession {
+  /** 会话唯一ID */
   id: string;
+  /** 会话中的所有消息 */
   messages: ChatMessage[];
+  /** 会话创建时间 */
   createdAt: Date;
+  /** 会话最后更新时间 */
   updatedAt: Date;
 }
 
+/**
+ * AI聊天服务类
+ * 处理用户消息的智能回复和会话管理
+ */
 export class ChatService {
+  /** 存储所有活跃的聊天会话 */
   private sessions: Map<string, ChatSession> = new Map();
 
+  /**
+   * 处理用户消息并生成AI回复
+   *
+   * @param message 用户输入的消息
+   * @param sessionId 可选的会话ID，如果不提供则创建新会话
+   * @returns AI生成的回复内容
+   */
   async processMessage(message: string, sessionId?: string): Promise<string> {
     // 获取或创建会话
     const session = this.getOrCreateSession(sessionId);
@@ -45,7 +83,7 @@ export class ChatService {
           const intentResult = await getToolByName('detect_intent')?.function({ message }) || { success: false, intent: 'general' };
 
           if (intentResult.success && intentResult.intent === 'time_query') {
-            // 时间查询：使用时间工具获取准确时间
+            // 普通时间查询：只返回当前时间
             try {
               const timeResult = await getToolByName('get_current_time')?.function({}) || { success: false, error: '工具不可用' };
 
@@ -65,6 +103,30 @@ export class ChatService {
               }
             } catch (timeError) {
               console.warn('Time tool failed, using fallback:', timeError);
+              finalResponse = this.getTimeFallbackResponse();
+            }
+          } else if (intentResult.success && intentResult.intent === 'historical_time_query') {
+            // 历史时间查询：结合记忆检索
+            try {
+              const timeResult = await getToolByName('get_current_time')?.function({}) || { success: false, error: '工具不可用' };
+              const timeContext = timeResult.success ? `当前准确时间是：${timeResult.datetime}（${timeResult.timezone}时区）` : '';
+
+              // 检索相关记忆
+              const relevantDocs = await ragSystem.searchRelevantDocuments(message, 5);
+              const context = this.buildContext(relevantDocs);
+
+              const historicalPrompt = `${timeContext ? timeContext + '\n\n' : ''}用户的问题涉及历史事件或过去的时间。请基于以下相关记忆信息来回答：
+
+${context ? `相关记忆信息：\n${context}\n\n` : '没有找到相关记忆信息。\n\n'}
+
+用户的问题：${message}
+
+请基于上述信息回答用户的问题。如果记忆信息中没有相关内容，请说明没有找到相关信息。`;
+
+              const response = await this.callOpenAIAPI(historicalPrompt);
+              finalResponse = response.text;
+            } catch (historicalError) {
+              console.warn('Historical time query failed, using fallback:', historicalError);
               finalResponse = this.getTimeFallbackResponse();
             }
           } else if (intentResult.success && intentResult.intent === 'lab_related') {
@@ -157,35 +219,14 @@ ${context ? `相关信息：\n${context}\n\n` : ''}
   }
 
   // 后备意图判断方法（离线版本）
+  // 注意：由于我们现在完全依赖AI进行意图判断，这里返回false让系统使用通用处理
   private isTimeQueryFallback(message: string): boolean {
-    const timeKeywords = [
-      '时间', '日期', '时候', '几点', '现在几点', '几点了',
-      '当前时间', '现在时间', '当前日期', '现在日期',
-      'what time', 'time now', 'current time', 'what date', 'current date'
-    ];
-
-    const lowerMessage = message.toLowerCase();
-    const matchedKeywords = timeKeywords.filter(keyword =>
-      lowerMessage.includes(keyword.toLowerCase())
-    );
-
-    return matchedKeywords.length > 0;
+    return false; // 不使用关键词匹配，完全依赖AI判断
   }
 
+
   private isLabRelatedFallback(message: string): boolean {
-    const labKeywords = [
-      'igame', '实验室', '教授', '徐岗', '计算机辅助设计', '等几何分析',
-      '计算机视觉', '机器学习', '研究生', '博士', '研究', '项目',
-      '论文', '学术', '活动', '新闻', '杭州电子科技大学', '计算机学院',
-      '可视化', '仿真', '团队', '成员', '负责人', '规模'
-    ];
-
-    const lowerMessage = message.toLowerCase();
-    const matchedKeywords = labKeywords.filter(keyword =>
-      lowerMessage.includes(keyword.toLowerCase())
-    );
-
-    return matchedKeywords.length > 0;
+    return false; // 不使用关键词匹配，完全依赖AI判断
   }
 
   // 时间查询的离线回答

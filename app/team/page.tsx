@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ScrollReveal, StaggerContainer, HoverEffect } from "../../components/layout/page-transition";
+import { ScrollReveal, StaggerContainer, HoverEffect } from "../components/layout/page-transition";
 import { useScrollAnimation, scrollAnimationPresets } from "../../hooks/use-scroll-animation";
 
 // 教师团队数据
@@ -177,262 +177,198 @@ const graduateStudents = {
   }
 };
 
-// 教师卡片组件 - 科技感设计
+// 教师卡片组件 - 简约设计
 function FacultyCard({ member }: { member: typeof facultyMembers[0] }) {
   return (
-    <div className="tech-card group relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl">
-      {/* 悬停时的背景渐变效果 */}
-      <div className="absolute inset-0 bg-linear-to-br from-blue-50/50 to-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+    <ScrollReveal>
+      <motion.div
+        className="subtle-hover bg-transparent hover:bg-white/60 hover:backdrop-blur-sm hover:border-white/80 rounded-xl border border-white/20 p-8 transition-colors"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex flex-col items-center text-center space-y-6">
+          <div className="relative w-32 h-32 rounded-full overflow-hidden">
+            <Image
+              src={member.image}
+              alt={member.name}
+              fill
+              className="object-cover"
+            />
+          </div>
 
-      <div className="aspect-square relative overflow-hidden">
-        <Image
-          src={member.image}
-          alt={member.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        {/* 图片覆盖层 */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-medium text-primary-charcoal">
+              {member.name}
+            </h3>
+            <p className="text-secondary-slate font-medium">
+              {member.title}
+            </p>
+            <p className="text-text-muted text-sm leading-relaxed max-w-xs">
+              {member.research}
+            </p>
+          </div>
 
-      <div className="relative p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-900 transition-colors">
-          {member.name}
-        </h3>
-        <p className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-blue-600 font-semibold mb-3">
-          {member.title}
-        </p>
-        <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-          {member.research}
-        </p>
-
-        <div className="flex space-x-3">
-          {member.link ? (
-            <a
-              href={member.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center bg-linear-to-r from-blue-500 to-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-            >
-              <i className="bi bi-link-45deg mr-2"></i>
-              个人主页
-            </a>
-          ) : (
-            <Link
-              href={`/team/${member.id}`}
-              className="flex-1 inline-flex items-center justify-center bg-linear-to-r from-blue-500 to-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-            >
-              <i className="bi bi-eye mr-2"></i>
-              查看详情
-            </Link>
-          )}
+          <div className="w-full">
+            {member.link ? (
+              <a
+                href={member.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="elegant-button w-full justify-center"
+              >
+                个人主页
+              </a>
+            ) : (
+              <Link
+                href={`/team/${member.id}`}
+                className="elegant-button w-full justify-center"
+              >
+                查看详情
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </ScrollReveal>
   );
 }
 
-// 学生列表组件 - 科技感设计
+// 学生列表组件 - 简约设计
 function StudentList({ students, title }: { students: any, title: string }) {
   if (Array.isArray(students)) {
-    // 博士研究生列表
+    // 博士研究生列表 — 多栏、透明
     return (
-      <div className="tech-card bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl p-8">
-        <div className="flex items-center mb-8">
-          <div className="w-12 h-12 bg-linear-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center mr-4">
-            <i className="bi bi-mortarboard-fill text-white text-xl"></i>
+      <ScrollReveal>
+        <motion.div
+          className="p-4 h-full"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="mb-6">
+            <h3 className="elegant-heading text-2xl">{title}</h3>
           </div>
-          <h3 className="text-2xl font-bold gradient-text">{title}</h3>
-        </div>
-        <div className="space-y-4">
-          {students.map((student: any, index: number) => (
-            <div key={index} className="group flex items-center justify-between py-4 px-4 rounded-xl hover:bg-linear-to-r hover:from-blue-50 hover:to-blue-50 transition-all duration-300 border border-transparent hover:border-blue-100">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                  {student.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 group-hover:text-blue-900 transition-colors">{student.name}</p>
-                  <p className="text-sm text-gray-600">{student.research}</p>
-                </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-sm text-primary-charcoal">
+            {students.map((student: any, index: number) => (
+              <div key={index} className="mb-4">
+                <p className="font-medium">{student.name}</p>
+                <p className="text-text-muted text-sm">{student.research}{student.year ? `, ${student.year}` : ''}</p>
               </div>
-              <span className="text-sm font-medium text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
-                {student.year}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </motion.div>
+      </ScrollReveal>
     );
   } else {
-    // 硕士研究生按年级分组
+    // 硕士研究生按年级分组 — 年级分隔、多栏
     return (
-      <div className="tech-card bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl p-8">
-        <div className="flex items-center mb-8">
-          <div className="w-12 h-12 bg-linear-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
-            <i className="bi bi-people-fill text-white text-xl"></i>
+      <ScrollReveal>
+        <motion.div
+          className="p-4 h-full"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="mb-6">
+            <h3 className="elegant-heading text-2xl">{title}</h3>
           </div>
-          <h3 className="text-2xl font-bold gradient-text">{title}</h3>
-        </div>
-        <div className="max-h-96 overflow-y-auto space-y-6 scrollbar-hide">
-          {Object.entries(students).map(([year, studentList], yearIndex) => (
-            <div key={year} className="relative">
-              {/* 年级分隔线 */}
-              <div className="flex items-center mb-4">
-                <div className="flex-1 h-px bg-linear-to-r from-transparent via-blue-200 to-transparent"></div>
-                <h4 className="text-lg font-bold text-gray-800 mx-4 px-4 py-2 bg-linear-to-r from-blue-50 to-blue-50 rounded-full border border-blue-100">
-                  <span className="gradient-text">{year}</span> 硕士研究生
-                </h4>
-                <div className="flex-1 h-px bg-linear-to-r from-transparent via-blue-200 to-transparent"></div>
-              </div>
 
-              <div className="space-y-3 pl-4">
-                {(studentList as any[]).map((student, index) => (
-                  <div key={index} className="group flex items-center justify-between py-3 px-4 rounded-xl hover:bg-linear-to-r hover:from-green-50 hover:to-blue-50 transition-all duration-300 border border-transparent hover:border-green-100">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-8 h-8 bg-linear-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-white font-semibold text-xs">
-                        {student.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900 group-hover:text-green-900 transition-colors">{student.name}</p>
-                        <p className="text-sm text-gray-600">{student.research}</p>
-                      </div>
+          <div className="space-y-10">
+            {Object.entries(students).map(([year, studentList]) => (
+              <div key={year}>
+                <div className="text-center my-4">
+                  <span className="text-secondary-slate">---{year}---</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm text-primary-charcoal">
+                  {(studentList as any[]).map((student, idx) => (
+                    <div key={idx} className="mb-3">
+                      <p className="font-medium">{student.name}</p>
+                      <p className="text-text-muted text-sm">{student.research}</p>
                     </div>
-                    <span className="text-sm font-medium text-transparent bg-clip-text bg-linear-to-r from-green-600 to-blue-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
-                      {year}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </motion.div>
+      </ScrollReveal>
     );
   }
 }
 
 export default function TeamPage() {
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)' }}>
-      {/* 页面标题 - 科技感设计 */}
-      <div className="relative overflow-hidden">
-        {/* 背景装饰元素 */}
-        <div className="absolute inset-0 bg-linear-to-br from-blue-50 via-indigo-50 to-blue-50 opacity-50"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <div className="mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-linear-to-br from-blue-500 to-blue-600 rounded-full mb-6 shadow-lg">
-                <i className="bi bi-person-badge text-3xl text-white"></i>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-6">
-                团队成员
-              </h1>
-              <div className="w-24 h-1 bg-linear-to-r from-blue-500 to-blue-600 mx-auto rounded-full"></div>
-            </div>
-            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              我们拥有优秀的教师团队和充满活力的研究生群体，共同致力于前沿技术研究和人才培养。
-            </p>
-          </div>
+    <div className="min-h-screen bg-warm">
+      {/* 页面标题 - 使用 Research 页面的设计 */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+          <h1 className="text-4xl font-bold text-primary-charcoal mb-4 elegant-heading">
+            <i className="bi bi-people mr-3 text-accent-blue"></i>实验室团队
+          </h1>
+          <p className="text-lg elegant-subheading max-w-3xl mx-auto">
+            Team Members
+          </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        {/* 教师团队 */}
-        <section className="mb-24">
+      {/* 教师团队 */}
+      <div className="py-24 bg-transparent">
+        <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal className="text-center mb-16">
-            <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl mb-6 shadow-lg"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <i className="bi bi-person-badge-fill text-2xl text-white"></i>
-            </motion.div>
             <motion.h2
-              className="text-4xl md:text-5xl font-bold gradient-text mb-6"
-              initial={{ opacity: 0, y: 30 }}
+              className="elegant-heading text-3xl md:text-4xl mb-6"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
               教师团队
             </motion.h2>
-            <motion.div
-              className="w-32 h-1 bg-linear-to-r from-blue-500 via-indigo-500 to-blue-600 mx-auto rounded-full mb-6"
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            />
-            <motion.p
-              className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              汇聚多位资深教授和青年教师，拥有丰富的教学经验和卓越的科研成果
-            </motion.p>
+            <div className="w-16 h-px bg-linear-to-r from-transparent via-secondary-slate to-transparent mx-auto"></div>
           </ScrollReveal>
 
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {facultyMembers.map((member, index) => (
-              <HoverEffect key={member.id}>
-                <FacultyCard member={member} />
-              </HoverEffect>
+              <FacultyCard key={member.id} member={member} />
             ))}
-          </StaggerContainer>
-        </section>
+          </div>
+        </div>
+      </div>
 
-        {/* 学生团队 */}
-        <section>
+      {/* 研究生团队 */}
+      <div className="py-24 bg-transparent">
+        <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal className="text-center mb-16">
-            <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-green-500 to-teal-600 rounded-2xl mb-6 shadow-lg"
-              whileHover={{ scale: 1.1, rotate: -5 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <i className="bi bi-people-fill text-2xl text-white"></i>
-            </motion.div>
             <motion.h2
-              className="text-4xl md:text-5xl font-bold gradient-text mb-6"
-              initial={{ opacity: 0, y: 30 }}
+              className="elegant-heading text-3xl md:text-4xl mb-6"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              学生团队
+              研究生团队
             </motion.h2>
-            <motion.div
-              className="w-32 h-1 bg-linear-to-r from-green-500 via-teal-500 to-blue-600 mx-auto rounded-full mb-6"
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            />
-            <motion.p
-              className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              {graduateStudents.phd.length}名博士研究生和{Object.values(graduateStudents.masters).flat().length}名硕士研究生组成的学术梯队
-            </motion.p>
+            <div className="w-16 h-px bg-linear-to-r from-transparent via-secondary-slate to-transparent mx-auto"></div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <ScrollReveal direction="left">
+          <div className="space-y-12">
+            <ScrollReveal direction="left" className="h-full">
               <StudentList students={graduateStudents.phd} title="博士研究生" />
             </ScrollReveal>
-            <ScrollReveal direction="right" delay={0.2}>
+
+            <div className="w-full h-px bg-linear-to-r from-transparent via-secondary-slate to-transparent" />
+
+            <ScrollReveal direction="right" delay={0.2} className="h-full">
               <StudentList students={graduateStudents.masters} title="硕士研究生" />
             </ScrollReveal>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );

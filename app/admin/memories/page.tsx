@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import MemoryUpload from '@/components/ai/memory-upload';
+import MemoryUpload from '../../components/ai/memory-upload';
 import Link from 'next/link';
 
 interface MemoryDocument {
@@ -166,3 +166,5 @@ export default function MemoriesAdminPage() {
     </div>
   );
 }
+
+
