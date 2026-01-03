@@ -127,9 +127,7 @@ PINECONE_INDEX_NAME=igame-lab-memory
 
 ### 数据库设置
 
-#### MySQL 数据库设置
-
-**自动设置（推荐）**
+#### Linux/macOS 自动设置
 ```bash
 # 设置数据库密码（根据需要修改）
 export DB_PASSWORD=your_mysql_password
@@ -138,11 +136,127 @@ export DB_PASSWORD=your_mysql_password
 npm run setup-db
 ```
 
+#### Windows 自动设置
+```powershell
+# 使用 PowerShell 脚本（推荐）
+.\scripts\setup-database-windows.ps1 -DB_PASSWORD your_mysql_password
+
+# 或使用 npm 脚本
+npm run setup-db-windows
+```
+
+#### Windows 手动设置
+
+##### 1. 安装 MySQL
+1. 下载 MySQL Installer：[https://dev.mysql.com/downloads/installer/](https://dev.mysql.com/downloads/installer/)
+2. 运行安装程序，选择以下组件：
+   - MySQL Server
+   - MySQL Shell
+   - MySQL Router (可选)
+3. 在安装过程中设置 root 密码
+4. 验证安装：
+   ```bash
+   mysql --version
+   ```
+
+##### 2. 创建数据库和用户
+```sql
+-- 连接到 MySQL
+mysql -u root -p
+
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS igame_lab
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+-- 创建应用专用用户
+CREATE USER IF NOT EXISTS 'igame_app'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON igame_lab.* TO 'igame_app'@'localhost';
+FLUSH PRIVILEGES;
+
+-- 退出 MySQL
+EXIT;
+```
+
+##### 3. 创建数据表
+```sql
+-- 连接到数据库
+mysql -u igame_app -p igame_lab
+
+-- 创建内存文档表
+CREATE TABLE IF NOT EXISTS memory_documents (
+  id VARCHAR(100) PRIMARY KEY,
+  title VARCHAR(500) NOT NULL,
+  content LONGTEXT NOT NULL,
+  type VARCHAR(100) NOT NULL,
+  file_name VARCHAR(500),
+  chunk_index INT DEFAULT 0,
+  total_chunks INT DEFAULT 1,
+  pinecone_id VARCHAR(200) NOT NULL,
+  status ENUM('active', 'deleted') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_status (status),
+  INDEX idx_type (type),
+  INDEX idx_created_at (created_at),
+  INDEX idx_pinecone_id (pinecone_id),
+  INDEX idx_file_name (file_name),
+  FULLTEXT INDEX ft_title_content (title, content)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 创建学生信息表
+CREATE TABLE IF NOT EXISTS students (
+  id VARCHAR(100) PRIMARY KEY,
+  chinese_name VARCHAR(100) NOT NULL,
+  english_name VARCHAR(200),
+  grade VARCHAR(50) NOT NULL,
+  degree VARCHAR(50) NOT NULL,
+  research VARCHAR(500),
+  bio LONGTEXT,
+  email VARCHAR(200),
+  phone VARCHAR(20),
+  avatar VARCHAR(500),
+  github VARCHAR(500),
+  linkedin VARCHAR(500),
+  website VARCHAR(500),
+  skills LONGTEXT,
+  interests LONGTEXT,
+  publications LONGTEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_grade (grade),
+  INDEX idx_degree (degree),
+  INDEX idx_chinese_name (chinese_name),
+  INDEX idx_english_name (english_name),
+  FULLTEXT INDEX ft_bio_skills (bio, skills, interests)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 创建统计视图
+CREATE OR REPLACE VIEW memory_stats AS
+SELECT
+  COUNT(*) as total_documents,
+  SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_documents,
+  SUM(CASE WHEN status = 'deleted' THEN 1 ELSE 0 END) as deleted_documents,
+  COUNT(DISTINCT type) as unique_types
+FROM memory_documents;
+```
+
+##### 4. PowerShell 执行策略
+如果 PowerShell 脚本无法运行：
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+##### 5. 学生信息管理
+- 点击团队页面中的学生名字时，如果显示404错误，这是正常现象
+- 404表示该学生信息尚未创建，页面会自动进入编辑模式
+- 只需要填写基本信息并保存即可创建学生资料
+
 脚本将自动完成：
 - ✅ 检查系统环境
 - ✅ 创建数据库和用户
 - ✅ 设置权限
-- ✅ 创建表和视图
+- ✅ 创建表和视图（包括学生信息表）
 - ✅ 生成配置文件
 - ✅ 验证设置
 
@@ -173,7 +287,9 @@ EXIT;
 
 **创建数据表和视图**
 
-如果您倾向于手动创建表和视图，可以在MySQL命令行中依次执行以下SQL语句：
+如果您倾向于手动创建表和视图，请参考 [DATABASE.md](DATABASE.md) 文档中的完整SQL语句。
+
+或者在MySQL命令行中依次执行以下SQL语句：
 
 ```sql
 -- 切换到数据库
@@ -267,6 +383,240 @@ npm run init-memories           # 初始化记忆数据
 npm run test-pinecone           # 测试 Pinecone 连接
 ```
 
+## 📊 SQL语句参考
+
+### 数据库结构
+
+**1. 内存文档表 (memory_documents)**
+```sql
+CREATE TABLE IF NOT EXISTS memory_documents (
+  id VARCHAR(100) PRIMARY KEY,
+  title VARCHAR(500) NOT NULL,
+  content LONGTEXT NOT NULL,
+  type VARCHAR(100) NOT NULL,
+  file_name VARCHAR(500),
+  chunk_index INT DEFAULT 0,
+  total_chunks INT DEFAULT 1,
+  pinecone_id VARCHAR(200) NOT NULL,
+  status ENUM('active', 'deleted') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  INDEX idx_status (status),
+  INDEX idx_type (type),
+  INDEX idx_created_at (created_at),
+  INDEX idx_pinecone_id (pinecone_id),
+  INDEX idx_file_name (file_name),
+
+  FULLTEXT INDEX ft_title_content (title, content)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+**2. 学生信息表 (students)**
+```sql
+CREATE TABLE IF NOT EXISTS students (
+  id VARCHAR(100) PRIMARY KEY,
+  chinese_name VARCHAR(100) NOT NULL,
+  english_name VARCHAR(200),
+  grade VARCHAR(50) NOT NULL,
+  degree VARCHAR(50) NOT NULL,
+  research VARCHAR(500),
+  bio LONGTEXT,
+  email VARCHAR(200),
+  phone VARCHAR(20),
+  avatar VARCHAR(500),
+  github VARCHAR(500),
+  linkedin VARCHAR(500),
+  website VARCHAR(500),
+  skills LONGTEXT,
+  interests LONGTEXT,
+  publications LONGTEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  INDEX idx_grade (grade),
+  INDEX idx_degree (degree),
+  INDEX idx_chinese_name (chinese_name),
+  INDEX idx_english_name (english_name),
+
+  FULLTEXT INDEX ft_bio_skills (bio, skills, interests)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+**3. 统计视图 (memory_stats)**
+```sql
+CREATE OR REPLACE VIEW memory_stats AS
+SELECT
+  COUNT(*) as total_documents,
+  SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_documents,
+  SUM(CASE WHEN status = 'deleted' THEN 1 ELSE 0 END) as deleted_documents,
+  COUNT(DISTINCT type) as unique_types
+FROM memory_documents;
+```
+
+### 常用查询语句
+
+**数据查询**
+```sql
+-- 查询活跃的内存文档
+SELECT id, title, type, created_at
+FROM memory_documents
+WHERE status = 'active'
+ORDER BY created_at DESC
+LIMIT 10;
+
+-- 按类型统计文档数量
+SELECT type, COUNT(*) as count
+FROM memory_documents
+WHERE status = 'active'
+GROUP BY type
+ORDER BY count DESC;
+
+-- 查询学生信息
+SELECT id, chinese_name, english_name, grade, degree
+FROM students
+ORDER BY grade DESC, chinese_name ASC;
+
+-- 按年级统计学生数量
+SELECT grade, COUNT(*) as count
+FROM students
+GROUP BY grade
+ORDER BY grade DESC;
+```
+
+**数据库维护**
+```sql
+-- 备份数据库
+mysqldump -u igame_app -p igame_lab > igame_lab_backup.sql
+
+-- 恢复数据库
+mysql -u igame_app -p igame_lab < igame_lab_backup.sql
+
+-- 清理已删除的文档（软删除变硬删除）
+DELETE FROM memory_documents
+WHERE status = 'deleted'
+AND updated_at < DATE_SUB(NOW(), INTERVAL 30 DAY);
+
+-- 优化表
+OPTIMIZE TABLE memory_documents;
+OPTIMIZE TABLE students;
+```
+
+**性能监控**
+```sql
+-- 查看表大小
+SELECT
+  table_name,
+  ROUND(data_length / 1024 / 1024, 2) as data_mb,
+  ROUND(index_length / 1024 / 1024, 2) as index_mb,
+  ROUND((data_length + index_length) / 1024 / 1024, 2) as total_mb
+FROM information_schema.tables
+WHERE table_schema = 'igame_lab'
+ORDER BY total_mb DESC;
+
+-- 查看连接状态
+SHOW PROCESSLIST;
+
+-- 查看数据库性能指标
+SHOW ENGINE INNODB STATUS;
+```
+
+**用户管理**
+```sql
+-- 查看所有用户
+SELECT user, host FROM mysql.user WHERE user LIKE 'igame%';
+
+-- 修改用户密码
+ALTER USER 'igame_app'@'localhost' IDENTIFIED BY 'new_secure_password';
+
+-- 删除用户
+DROP USER 'igame_app'@'localhost';
+DROP USER 'igame_app'@'%';
+```
+
+### 高级数据库管理
+
+#### 数据一致性检查
+```sql
+-- 检查外键约束
+SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  CONSTRAINT_NAME,
+  REFERENCED_TABLE_NAME,
+  REFERENCED_COLUMN_NAME
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_SCHEMA = 'igame_lab';
+
+-- 检查数据完整性
+CHECK TABLE memory_documents;
+CHECK TABLE students;
+
+-- 修复表（如果发现问题）
+REPAIR TABLE memory_documents;
+REPAIR TABLE students;
+```
+
+#### 监控和诊断
+```sql
+-- 查看数据库大小总览
+SELECT
+  table_schema as 'Database',
+  ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as 'Size (MB)',
+  COUNT(*) as 'Tables'
+FROM information_schema.tables
+GROUP BY table_schema
+ORDER BY SUM(data_length + index_length) DESC;
+
+-- 查看索引使用情况
+SELECT
+  TABLE_NAME,
+  INDEX_NAME,
+  SEQ_IN_INDEX,
+  COLUMN_NAME,
+  CARDINALITY,
+  PAGES,
+  FILTER_CONDITION
+FROM information_schema.STATISTICS
+WHERE TABLE_SCHEMA = 'igame_lab'
+ORDER BY TABLE_NAME, SEQ_IN_INDEX;
+
+-- 查看锁信息
+SHOW OPEN TABLES WHERE In_use > 0;
+
+-- 查看InnoDB缓冲池状态
+SHOW ENGINE INNODB STATUS\G
+```
+
+#### 定期维护脚本
+```bash
+#!/bin/bash
+# 数据库定期维护脚本
+
+DB_USER="igame_app"
+DB_NAME="igame_lab"
+BACKUP_DIR="/var/backups/igame_lab"
+
+# 创建备份目录
+mkdir -p "$BACKUP_DIR"
+
+# 备份数据库
+mysqldump -u "$DB_USER" -p "$DB_NAME" > "$BACKUP_DIR/igame_lab_$(date +%Y%m%d_%H%M%S).sql"
+
+# 只保留最近7天的备份
+find "$BACKUP_DIR" -name "igame_lab_*.sql" -mtime +7 -delete
+
+# 优化表
+mysql -u "$DB_USER" -p -e "
+USE $DB_NAME;
+OPTIMIZE TABLE memory_documents;
+OPTIMIZE TABLE students;
+ANALYZE TABLE memory_documents;
+ANALYZE TABLE students;
+"
+
+echo "数据库维护完成"
+```
 
 ## 🚨 快速故障排除
 
@@ -277,6 +627,19 @@ npm run test-db
 
 # 如果失败，运行自动设置
 npm run setup-db
+```
+
+### 学生信息相关问题
+```bash
+# 点击学生名字显示404错误（这是正常现象）
+# 404表示学生信息尚未创建，页面会自动进入编辑模式
+
+# 如果页面没有自动进入编辑模式，请刷新页面
+# 或者直接访问: http://localhost:3000/team/[student_id]
+
+# 示例：
+# http://localhost:3000/team/wang_shiqi
+# http://localhost:3000/team/li_si
 ```
 
 ### Pinecone连接问题
@@ -336,6 +699,12 @@ npm install
 npm run build
 npm run start
 ```
+
+## 📚 相关文档
+
+- [upgraded_project_documentation.md](upgraded_project_documentation.md) - 项目技术架构和升级方案
+- [API文档](https://igame-lab.dasusm.com/api-docs) - REST API 接口文档
+- [部署指南](https://igame-lab.dasusm.com/deploy) - 生产环境部署指南
 
 ## 🤝 贡献指南
 

@@ -199,6 +199,13 @@ else
     exit 1
 fi
 
+if echo "$TABLES" | grep -q "students"; then
+    print_success "表 'students' 已创建"
+else
+    print_error "表 'students' 创建失败"
+    exit 1
+fi
+
 if echo "$TABLES" | grep -q "memory_stats"; then
     print_success "视图 'memory_stats' 已创建"
 else
@@ -260,7 +267,7 @@ echo "📋 配置摘要:"
 echo "  🗄️  数据库: $DB_NAME"
 echo "  🖥️  主机: $DB_HOST:$DB_PORT"
 echo "  👤 用户: ${DB_APP_USER:-$DB_USER}"
-echo "  📊 表: memory_documents"
+echo "  📊 表: memory_documents, students"
 echo "  👁️  视图: memory_stats"
 echo ""
 echo "🚀 接下来可以运行:"

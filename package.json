@@ -1,6 +1,7 @@
 {
   "name": "my-app",
   "version": "0.1.0",
+  "description": "iGame Lab 官网 - 智能可视化与仿真实验室网站，集成AI聊天助手、向量搜索记忆系统、学生信息管理和丰富的视觉效果",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +11,7 @@
     "create-pinecone-index": "tsx scripts/create-pinecone-index.ts",
     "init-db": "tsx scripts/init-database.ts",
     "setup-db": "bash scripts/setup-database.sh",
+    "setup-db-windows": "powershell -ExecutionPolicy Bypass -File scripts/setup-database-windows.ps1",
     "setup-demo": "bash setup-demo.sh"
   },
   "dependencies": {
@@ -49,6 +51,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

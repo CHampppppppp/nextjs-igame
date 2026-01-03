@@ -143,6 +143,14 @@ npm run init-db
 echo "🧪 Testing database connection..."
 npm run test-db
 
+# 验证学生表
+echo "👥 Verifying student table..."
+if mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASSWORD" -e "USE \`$DB_NAME\`; DESCRIBE students;" &> /dev/null; then
+    echo "✅ Student table verified"
+else
+    echo "❌ Student table verification failed"
+fi
+
 # 设置环境变量文件（如果不存在）
 if [ ! -f .env ]; then
     echo "📝 Creating .env file..."
@@ -174,6 +182,7 @@ echo "- Check status: pm2 status"
 echo ""
 echo "📚 Documentation:"
 echo "- Admin panel: http://localhost:3000/admin/memories"
-echo "- API endpoints: /api/memories"
+echo "- Team management: http://localhost:3000/team"
+echo "- API endpoints: /api/memories, /api/students"
 echo ""
 echo "Happy deploying! 🎊"
