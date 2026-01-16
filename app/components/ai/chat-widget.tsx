@@ -227,7 +227,7 @@ export default function ChatWidget() {
               <div className="flex items-center justify-between">
                 <button
                   onClick={startNewConversation}
-                  className="flex items-center space-x-1 text-white rounded-lg px-3 py-1 text-sm transition-colors"
+                  className="flex items-center space-x-1 text-white mt-2 border-1 cursor-pointer hover:bg-[rgba(255,255,255,0.2)] rounded-lg px-3 py-1 text-sm transition-colors"
                   title="开启新对话"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,7 +236,7 @@ export default function ChatWidget() {
                   <span>新对话</span>
                 </button>
 
-                <div className="text-xs opacity-75">
+                <div className="text-xs opacity-75 mt-2">
                   {messages.length > 0 ? `${messages.length} 条消息` : '暂无消息'}
                 </div>
               </div>
@@ -288,7 +288,7 @@ export default function ChatWidget() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="输入您的问题..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
                 />
                 <button

@@ -1,5 +1,4 @@
 import { prisma } from './prisma';
-import type { MemoryDocument } from '@prisma/client';
 
 // 记忆文档接口
 export interface MemoryDocumentRecord {
@@ -50,7 +49,7 @@ export async function getAllMemoryDocuments(): Promise<MemoryDocumentRecord[]> {
       orderBy: { createdAt: 'desc' },
     });
 
-    return documents.map((doc: MemoryDocument) => ({
+    return documents.map((doc) => ({
       id: doc.id,
       title: doc.title,
       content: doc.content,
@@ -224,7 +223,7 @@ export async function searchMemoryDocuments(searchTerm: string, limit: number = 
       take: limit,
     });
 
-    return documents.map((doc: MemoryDocument) => ({
+    return documents.map((doc) => ({
       id: doc.id,
       title: doc.title,
       content: doc.content,
