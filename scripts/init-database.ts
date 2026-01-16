@@ -5,7 +5,7 @@
  * 使用 Prisma 初始化 Neon PostgreSQL 数据库
  */
 
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
