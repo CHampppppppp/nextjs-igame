@@ -6,7 +6,7 @@ export interface MemoryDocumentRecord {
   title: string;
   content: string;
   type: string;
-  fileName: string;
+  fileName?: string;
   chunkIndex: number;
   totalChunks: number;
   createdAt: Date;
@@ -101,28 +101,32 @@ export async function getMemoryDocumentById(id: string): Promise<MemoryDocumentR
 
 // 根据Pinecone ID获取记忆文档
 export async function getMemoryDocumentByPineconeId(pineconeId: string): Promise<MemoryDocumentRecord | null> {
-  const sql = `
-    SELECT
-      id, title, content, type, file_name as fileName,
-      chunk_index as chunkIndex, total_chunks as totalChunks,
-      created_at as createdAt, updated_at as updatedAt,
-      pinecone_id as pineconeId, status
-    FROM memory_documents
-    WHERE pinecone_id = ? AND status = 'active'
-  `;
+  try {
+    const document = await prisma.memoryDocument.findUnique({
+      where: { pineconeId },
+    });
 
-  const rows = await query(sql, [pineconeId]);
+    if (!document || document.status !== 'active') {
+      return null;
+    }
 
-  if (rows.length === 0) {
+    return {
+      id: document.id,
+      title: document.title,
+      content: document.content,
+      type: document.type,
+      fileName: document.fileName || undefined,
+      chunkIndex: document.chunkIndex,
+      totalChunks: document.totalChunks,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+      pineconeId: document.pineconeId,
+      status: document.status,
+    };
+  } catch (error) {
+    console.error('Failed to get memory document by Pinecone ID:', error);
     return null;
   }
-
-  const row = rows[0];
-  return {
-    ...row,
-    createdAt: new Date(row.createdAt),
-    updatedAt: new Date(row.updatedAt),
-  };
 }
 
 // 删除记忆文档（软删除）
@@ -148,17 +152,17 @@ export async function deleteMemoryDocument(id: string): Promise<boolean> {
 
 // 硬删除记忆文档（物理删除）
 export async function hardDeleteMemoryDocument(id: string): Promise<boolean> {
-  const sql = `DELETE FROM memory_documents WHERE id = ?`;
+  try {
+    const result = await prisma.memoryDocument.delete({
+      where: { id },
+    });
 
-  const result = await query(sql, [id]);
-  const affectedRows = (result as any).affectedRows || 0;
-
-  if (affectedRows > 0) {
     console.log(`Memory document permanently deleted: ${id}`);
-    return true;
+    return !!result;
+  } catch (error) {
+    console.error('Failed to hard delete memory document:', error);
+    return false;
   }
-
-  return false;
 }
 
 // 获取文档统计信息
@@ -168,58 +172,72 @@ export async function getMemoryStats(): Promise<{
   deleted: number;
   byType: Record<string, number>;
 }> {
-  // 总数统计
-  const totalSql = `SELECT COUNT(*) as count FROM memory_documents`;
-  const activeSql = `SELECT COUNT(*) as count FROM memory_documents WHERE status = 'active'`;
-  const deletedSql = `SELECT COUNT(*) as count FROM memory_documents WHERE status = 'deleted'`;
+  try {
+    // 使用 Prisma 进行统计查询
+    const [totalResult, activeResult, deletedResult, typeResults] = await Promise.all([
+      prisma.memoryDocument.count(),
+      prisma.memoryDocument.count({ where: { status: 'active' } }),
+      prisma.memoryDocument.count({ where: { status: 'deleted' } }),
+      prisma.memoryDocument.groupBy({
+        by: ['type'],
+        where: { status: 'active' },
+        _count: { type: true },
+      })
+    ]);
 
-  // 类型统计
-  const typeSql = `
-    SELECT type, COUNT(*) as count
-    FROM memory_documents
-    WHERE status = 'active'
-    GROUP BY type
-  `;
+    const byType: Record<string, number> = {};
+    typeResults.forEach((result) => {
+      byType[result.type] = result._count.type;
+    });
 
-  const [totalResult] = await query(totalSql);
-  const [activeResult] = await query(activeSql);
-  const [deletedResult] = await query(deletedSql);
-  const typeResults = await query(typeSql);
-
-  const byType: Record<string, number> = {};
-  typeResults.forEach((row: any) => {
-    byType[row.type] = row.count;
-  });
-
-  return {
-    total: totalResult.count,
-    active: activeResult.count,
-    deleted: deletedResult.count,
-    byType,
-  };
+    return {
+      total: totalResult,
+      active: activeResult,
+      deleted: deletedResult,
+      byType,
+    };
+  } catch (error) {
+    console.error('Failed to get memory stats:', error);
+    // 返回默认值
+    return {
+      total: 0,
+      active: 0,
+      deleted: 0,
+      byType: {},
+    };
+  }
 }
 
 // 搜索记忆文档（按标题和内容）
 export async function searchMemoryDocuments(searchTerm: string, limit: number = 20): Promise<MemoryDocumentRecord[]> {
-  const sql = `
-    SELECT
-      id, title, content, type, file_name as fileName,
-      chunk_index as chunkIndex, total_chunks as totalChunks,
-      created_at as createdAt, updated_at as updatedAt,
-      pinecone_id as pineconeId, status
-    FROM memory_documents
-    WHERE status = 'active'
-    AND (title LIKE ? OR content LIKE ?)
-    ORDER BY created_at DESC
-    LIMIT ?
-  `;
+  try {
+    const documents = await prisma.memoryDocument.findMany({
+      where: {
+        status: 'active',
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { content: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
 
-  const searchPattern = `%${searchTerm}%`;
-  const rows = await query(sql, [searchPattern, searchPattern, limit]);
-
-  return rows.map((row: any) => ({
-    ...row,
-    createdAt: new Date(row.createdAt),
-    updatedAt: new Date(row.updatedAt),
-  }));
+    return documents.map(doc => ({
+      id: doc.id,
+      title: doc.title,
+      content: doc.content,
+      type: doc.type,
+      fileName: doc.fileName || undefined,
+      chunkIndex: doc.chunkIndex,
+      totalChunks: doc.totalChunks,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+      pineconeId: doc.pineconeId,
+      status: doc.status,
+    }));
+  } catch (error) {
+    console.error('Failed to search memory documents:', error);
+    return [];
+  }
 }

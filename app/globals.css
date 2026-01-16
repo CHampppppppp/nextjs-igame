@@ -1,27 +1,60 @@
 @import "tailwindcss";
 
+/* Element Icons 字体 */
+@font-face {
+  font-family: 'element-icons';
+  src: url('/static/fonts/element-icons.732389d.ttf') format('truetype'),
+    url('/static/fonts/element-icons.535877f.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Iconfont 字体 */
+@font-face {
+  font-family: 'iconfont';
+  src: url('/static/fonts/iconfont.9c872ad.eot') format('embedded-opentype'),
+    url('/static/fonts/iconfont.57a0be4.ttf') format('truetype'),
+    url('/static/fonts/iconfont.39652b1.woff') format('woff'),
+    url('/static/img/iconfont.8cc2f42.svg#iconfont') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #0f0f0f;
 
   /* 极简高级色彩系统 */
-  --primary-charcoal: #0f172a;      /* 主色调 - 深炭色 */
-  --secondary-slate: #64748b;       /* 辅助色 - 石板灰 */
-  --accent-blue: #2563eb;           /* 强调色 - 科技蓝 */
+  --primary-charcoal: #0f172a;
+  /* 主色调 - 深炭色 */
+  --secondary-slate: #64748b;
+  /* 辅助色 - 石板灰 */
+  --accent-blue: #2563eb;
+  /* 强调色 - 科技蓝 */
   --accent-blue-strong: #1d4ed8;
-  --text-muted: #94a3b8;           /* 文本色 - 柔和灰 */
-  --text-muted: #94a3b8;           /* 文本色 - 柔和灰 */
+  --text-muted: #94a3b8;
+  /* 文本色 - 柔和灰 */
+  --text-muted: #94a3b8;
+  /* 文本色 - 柔和灰 */
 
   /* 背景系统 */
-  --bg-warm: #fafaf9;             /* 温暖背景 */
-  --bg-paper: #fefefe;            /* 纸张背景 */
-  --bg-overlay: rgba(250, 250, 249, 0.8); /* 轻微覆盖 */
+  --bg-warm: #fafaf9;
+  /* 温暖背景 */
+  --bg-paper: #fefefe;
+  /* 纸张背景 */
+  --bg-overlay: rgba(250, 250, 249, 0.8);
+  /* 轻微覆盖 */
 
   /* 渐变系统 */
   --gradient-primary: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
   --gradient-subtle: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   --gradient-warm: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
   --gradient-text: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  /* 卡片边框（可在暗色模式中覆盖） */
+  --card-border: rgba(15, 23, 42, 0.06);
+  --card-border-strong: rgba(15, 23, 42, 0.12);
 }
 
 @theme inline {
@@ -40,7 +73,8 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 2rem; /* 滚动安全区域 */
+  scroll-padding-top: 2rem;
+  /* 滚动安全区域 */
 }
 
 body {
@@ -50,18 +84,22 @@ body {
   line-height: 1.6;
   letter-spacing: -0.01em;
   /* 优化滚动体验 */
-  -webkit-overflow-scrolling: touch; /* iOS 丝滑滚动 */
+  -webkit-overflow-scrolling: touch;
+  /* iOS 丝滑滚动 */
   scroll-behavior: smooth;
 }
 
 /* 隐藏滚动条样式 */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
 
 /* 极简悬停效果 */
@@ -94,8 +132,16 @@ body {
   background: var(--bg-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--card-border);
   border-radius: 16px;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
+}
+
+.content-block:hover {
+  border-color: var(--card-border-strong);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
 }
 
 /* 优雅动画效果 */
@@ -104,6 +150,7 @@ body {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -115,6 +162,7 @@ body {
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -149,18 +197,39 @@ body {
 
 /* 丝滑滚动动画效果 */
 @keyframes gentle-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-3px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 @keyframes subtle-scale {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 @keyframes soft-glow {
-  0%, 100% { box-shadow: 0 0 0 rgba(37, 99, 235, 0); }
-  50% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.1); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.1);
+  }
 }
 
 /* 微妙动画类 */
@@ -204,8 +273,10 @@ body {
 /* 增强placeholder文字的可见度 */
 input::placeholder,
 textarea::placeholder {
-  color: #000000 !important; /* 使用纯黑色，提高对比度 */
-  opacity: 1 !important; /* 确保不透明度为1 */
+  color: #000000 !important;
+  /* 使用纯黑色，提高对比度 */
+  opacity: 1 !important;
+  /* 确保不透明度为1 */
 }
 
 /* 聚焦时placeholder颜色调整 */
@@ -271,4 +342,48 @@ textarea:focus::placeholder {
 .accent-button:hover {
   background: var(--accent-blue-strong);
   transform: translateY(-1px);
+}
+
+/* 图标字体使用类 */
+.element-icon {
+  font-family: 'element-icons';
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.iconfont {
+  font-family: 'iconfont';
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 图标字体大小类 */
+.icon-sm {
+  font-size: 0.875rem;
+}
+
+.icon-md {
+  font-size: 1rem;
+}
+
+.icon-lg {
+  font-size: 1.25rem;
+}
+
+.icon-xl {
+  font-size: 1.5rem;
+}
+
+.icon-2xl {
+  font-size: 2rem;
 }

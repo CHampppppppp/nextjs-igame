@@ -9,6 +9,7 @@ import { ScrollReveal, StaggerContainer, HoverEffect } from "./components/layout
 // 轮播组件
 function Carousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [scrollOpacity, setScrollOpacity] = useState(1);
 
   const slides = [
     {
@@ -35,12 +36,39 @@ function Carousel() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  // 监听滚动事件，实现图片随滚动逐渐透明的效果
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+
+      // 当滚动距离超过视窗高度的50%时开始透明化
+      // 滚动到视窗高度时完全透明
+      const fadeStart = windowHeight * 0.5;
+      const fadeEnd = windowHeight;
+
+      if (scrollY <= fadeStart) {
+        setScrollOpacity(1);
+      } else if (scrollY >= fadeEnd) {
+        setScrollOpacity(0);
+      } else {
+        // 线性插值计算透明度
+        const progress = (scrollY - fadeStart) / (fadeEnd - fadeStart);
+        setScrollOpacity(1 - progress);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="relative h-screen overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={index}
           className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+          style={{ opacity: index === currentSlide ? scrollOpacity : 0 }}
         >
           <Image
             src={slide.image}
@@ -68,7 +96,7 @@ function Carousel() {
                   {slide.title}
                 </motion.h1>
                 <motion.h2
-                  className="elegant-subheading text-xl md:text-2xl"
+                  className="text-white text-xl md:text-2xl"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
@@ -76,7 +104,7 @@ function Carousel() {
                   {slide.subtitle}
                 </motion.h2>
                 <motion.p
-                  className="elegant-body text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
+                  className="text-white text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
@@ -106,13 +134,13 @@ function Carousel() {
       {/* Navigation arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-8 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all z-20 border border-white/20"
+        className="absolute left-8 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white w-12 h-12 rounded-full flex justify-center transition-all z-20 border border-white/20 cursor-pointer text-3xl "
       >
         ‹
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all z-20 border border-white/20"
+        className="absolute right-8 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white w-12 h-12 rounded-full flex justify-center transition-all z-20 border border-white/20 cursor-pointer text-3xl"
       >
         ›
       </button>
@@ -132,229 +160,215 @@ function Carousel() {
   );
 }
 
-// 实验室简介组件 - 简约设计
+// 实验室简介组件 - 匹配旧HTML布局
 function LabIntro() {
   return (
-    <section className="py-24 bg-transparent">
-      <div className="max-w-4xl mx-auto px-6">
-        <ScrollReveal>
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="elegant-heading text-4xl md:text-5xl mb-6">实验室简介</h2>
-            <div className="w-16 h-px bg-gradient-to-r from-transparent via-secondary-slate to-transparent mx-auto mb-6"></div>
-            <p className="elegant-subheading text-lg">introduction</p>
-          </motion.div>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.2}>
-          <motion.div
-            className="elegant-body text-lg leading-relaxed space-y-6 max-w-3xl mx-auto"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <p>
-              智能可视建模与仿真实验室 (Intelligent Visual Modeling & Simulation Lab, iGame)，
-              隶属于<span className="font-medium">杭州电子科技大学计算机学院图形图像所</span>，负责人为<span className="font-medium">徐岗</span>教授。
-            </p>
-            <p>
-              团队现在拥有教师6名（其中教授1名，副教授3名，讲师2名），博士研究生3名，硕士研究生40多名。
-              团队主要研究方向包括计算机辅助设计与仿真、等几何分析、计算机视觉、机器学习等。
-            </p>
-            <p>
-              已在相关领域的国内外主流期刊/会议上发表学术论文80余篇，其中在CMAME、CAD、CAGD、Computers & Structures 、IEEE TCYB、IEEE TIP等国际权威SCI期刊发表论文30余篇，
-              多篇论文入选ESI热点论文和高被引论文。团队成员以负责人身份主持承担或完成多项国家自然科学基金项目（包括1项中德合作重点项目）。
-              并与多名国内外知名学者、出色研究小组保持着广泛和深入的学术交流与合作。
-            </p>
-          </motion.div>
-        </ScrollReveal>
-      </div>
-    </section>
-  );
-}
-
-// 近期论文组件 - 简约设计
-function RecentPapers() {
-  const papers = [
-    {
-      title: "Singularity structure simplification of hexahedral mesh via weighted ranking",
-      authors: "Gang Xu*, Ran Ling, Yongjie Jessica Zhang, Zhoufang Xiao, Zhongping Ji, Timon Rabczuk",
-      journal: "Computer-Aided Design",
-      year: "2021",
-      impact: "CCF B"
-    },
-    {
-      title: "IGA-suitable planar parameterization with patch structure simplification of closed-form polysquare",
-      authors: "S Wang, J Ren, X Fang, H Lin, G Xu, H Bao, J Huang",
-      journal: "Computer Methods in Applied Mechanics and Engineering",
-      year: "2022",
-      impact: "TOP期刊"
-    },
-    {
-      title: "Complementary, Heterogeneous and Adversarial Networks for Image-to-Image Translation",
-      authors: "Fei Gao, Xingxin Xu, Jun Yu, Meimei Shang, Xiang Li, and Dacheng Tao",
-      journal: "IEEE Transactions on Image Processing",
-      year: "2021",
-      impact: "TOP期刊"
-    }
-  ];
-
-  return (
-    <section className="py-24 bg-warm">
-      <div className="max-w-4xl mx-auto px-6">
-        <ScrollReveal className="text-center mb-16">
-          <motion.h2
-            className="elegant-heading text-4xl md:text-5xl mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            近期论文
-          </motion.h2>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-secondary-slate to-transparent mx-auto mb-6"></div>
-          <p className="elegant-subheading text-lg">Recent Publications</p>
-        </ScrollReveal>
-
-        <div className="space-y-12">
-          {papers.map((paper, index) => (
-            <ScrollReveal key={index} delay={index * 0.1}>
+    <section className="about-style-three p-24 bg-transparent">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* 左侧标题列 */}
+          <div className="lg:col-span-5 title-column">
+            <ScrollReveal>
               <motion.div
-                className="subtle-hover p-8 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <h3 className="text-xl font-medium mb-4 leading-tight text-primary-charcoal">
-                  {paper.title}
-                </h3>
-                <p className="text-secondary-slate mb-3 italic text-sm">
-                  {paper.authors}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-secondary-slate font-medium">
-                    {paper.journal}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-text-muted text-sm">
-                      {paper.year}
-                    </span>
-                    {paper.impact && (
-                      <span className="px-3 py-1 bg-accent-gold/10 text-accent-gold text-xs font-medium rounded-full">
-                        {paper.impact}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// 最新信息组件 - 简约设计
-function LatestNews() {
-  const news = [
-    { title: "实验室获得国家自然科学基金面上项目资助", date: "2024-01-15" },
-    { title: "新增4名博士研究生加入实验室", date: "2024-01-10" },
-    { title: "实验室论文在顶级期刊发表", date: "2024-01-05" },
-    { title: "与企业合作项目启动", date: "2023-12-28" }
-  ];
-
-  return (
-    <section className="py-24 bg-transparent">
-      <div className="max-w-4xl mx-auto px-6">
-        <ScrollReveal className="text-center mb-16">
-          <motion.h2
-            className="elegant-heading text-3xl md:text-4xl mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            最新信息
-          </motion.h2>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-secondary-slate to-transparent mx-auto"></div>
-        </ScrollReveal>
-
-        <div className="space-y-8">
-          {news.map((item, index) => (
-            <ScrollReveal key={index} delay={index * 0.1}>
-              <motion.div
-                className="flex justify-between items-start py-6 border-b border-text-muted/20 last:border-b-0"
+                className="title-box"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
               >
-                <h3 className="text-lg font-medium text-primary-charcoal leading-relaxed">
-                  {item.title}
-                </h3>
-                <span className="text-text-muted text-sm whitespace-nowrap ml-6">
-                  {item.date}
-                </span>
+                <h2 className="sec-title elegant-heading text-3xl md:text-4xl mb-4">实验室简介</h2>
+                <p className="title-text elegant-subheading text-lg text-secondary-slate">introduction</p>
               </motion.div>
             </ScrollReveal>
-          ))}
+          </div>
+
+          {/* 右侧内容列 */}
+          <div className="lg:col-span-7 content-column">
+            <ScrollReveal delay={0.2}>
+              <motion.div
+                className="content-box elegant-body text-lg leading-relaxed space-y-6"
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                <p className="top-text">
+                  智能可视建模与仿真实验室 (Intelligent Visual Modeling & Simulation Lab, iGame)，隶属于<b>杭州电子科技大学计算机学院图形图像所</b>，负责人为<b>徐岗</b>教授。
+                </p>
+                <p className="text">
+                  团队现在拥有教师6名（其中教授1名，副教授3名，讲师2名），博士研究生3名，硕士研究生40多名。团队主要研究方向包括计算机辅助设计与仿真、等几何分析、计算机视觉、机器学习等。
+                </p>
+                <p className="text">
+                  已在相关领域的国内外主流期刊/会议上发表学术论文80余篇，其中在CMAME、CAD、CAGD、Computers & Structures 、IEEE TCYB、IEEE TIP等国际权威SCI期刊发表论文30余篇，多篇论文入选ESI 热点论文和高被引论文。团队成员以负责人身份主持承担或完成多项国家自然科学基金项目（包括1项中德合作重点项目）。并与多名国内外知名学者、出色研究小组保持着广泛和深入的学术交流与合作。
+                </p>
+              </motion.div>
+            </ScrollReveal>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// 欢迎加入我们组件 - 简约设计
+// 近期论文和最新信息合并组件 - 匹配旧HTML结构
+function EventSection() {
+  const papers = [
+    {
+      title: "IGA-suitable planar parameterization with patch structure simplification of closed-form polysquare",
+      authors: "S Wang, J Ren, X Fang, H Lin, G Xu, H Bao, J Huang",
+      journal: "Computer Methods in Applied Mechanics and Engineering, 2022, 392: 114678",
+      impact: "TOP期刊"
+    },
+    {
+      title: "LASOR: Learning Accurate 3D Human Pose and Shape Via Synthetic Occlusion-Aware Data and Neural Mesh Rendering",
+      authors: "K Yang, R Gu, M Wang, M Toyoura*, G Xu*",
+      journal: "IEEE Transactions on Image Processing, 2022,31, 1938 - 1948",
+      impact: "TOP期刊"
+    },
+    {
+      title: "Construction of IGA-suitable Volume Parametric Models by the Segmentation-Mapping-Merging Mechanism of Design Features",
+      authors: "L Chen, N Bu, Y Jin, G Xu*, B Li",
+      journal: "Computer-Aided Design, 2022: 103228",
+      impact: "CCF B"
+    }
+  ];
+
+  const news = [
+    { title: "实验室一篇论文被顶刊TIP录用", date: "25 Feb, 2022" },
+    { title: "与之江实验室合作研发的\"面向深度学习的交互可视化与可视分析\"平台开源上线", date: "02 Nov, 2021" },
+    { title: "欢迎顾人舒博士加入iGame实验室！", date: "10 Dec, 2021" },
+    { title: "获批一项国家自然科学基金-浙江两化融合联合基金重点项目", date: "12 Nov, 2020" }
+  ];
+
+  return (
+    <section className="event-section p-24 bg-transparent">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* 近期论文 - 左侧8列 */}
+          <div className="lg:col-span-8">
+            <div className="event-content">
+              <div className="flex items-center mb-8">
+                <i className="bi bi-files text-2xl mr-3 text-primary-charcoal"></i>
+                <h2 className="elegant-heading text-2xl md:text-3xl">近期论文</h2>
+              </div>
+
+              <div className="space-y-8">
+                {papers.map((paper, index) => (
+                  <ScrollReveal key={index} delay={index * 0.1}>
+                    <motion.div
+                      className="single-item p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-white/80 shadow-sm"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <h3 className="text-xl font-medium mb-3 leading-tight text-primary-charcoal">
+                        {paper.title}
+                      </h3>
+                      <p className="text-secondary-slate mb-2 italic text-sm">
+                        {paper.authors}
+                      </p>
+                      <p className="text-secondary-slate text-sm">
+                        <i>{paper.journal}</i>
+                      </p>
+                      {paper.impact && (
+                        <div className="mt-2">
+                          <span className="px-3 py-1 bg-accent-gold/10 text-accent-gold text-xs font-medium rounded-full">
+                            {paper.impact}
+                          </span>
+                        </div>
+                      )}
+                    </motion.div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 最新信息 - 右侧4列 */}
+          <div className="lg:col-span-4">
+            <div className="latest-event">
+              <div className="flex items-center mb-8">
+                <i className="bi bi-calendar-check text-2xl mr-3 text-primary-charcoal"></i>
+                <h2 className="elegant-heading text-2xl md:text-3xl">最新信息</h2>
+              </div>
+
+              <div className="space-y-6">
+                {news.map((item, index) => (
+                  <ScrollReveal key={index} delay={index * 0.1}>
+                    <motion.div
+                      className="single-item p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/80 shadow-sm"
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <h4 className="text-base font-medium text-primary-charcoal leading-relaxed flex-1">
+                          {item.title}
+                        </h4>
+                        <span className="text-text-muted text-sm whitespace-nowrap flex-shrink-0">
+                          <i className="bi bi-calendar2-minus-fill mr-1"></i>
+                          {item.date}
+                        </span>
+                      </div>
+                    </motion.div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 欢迎加入我们组件 - 匹配旧HTML设计
 function JoinUs() {
   return (
-    <section className="py-24 bg-primary-charcoal text-black">
-      <div className="max-w-3xl mx-auto px-6 text-center">
+    <section className="cta-section py-24 bg-black text-white relative overflow-hidden">
+      {/* 背景图片 */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-60"
+        style={{ backgroundImage: "url('/images/background/bg.png')" }}
+      ></div>
+
+      <div className="container mx-auto px-6 text-center relative z-10">
         <ScrollReveal>
-          <motion.h2
-            className="elegant-heading text-3xl md:text-4xl mb-8"
+          <motion.div
+            className="content-box"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            欢迎加入我们
-          </motion.h2>
-        </ScrollReveal>
+            <h2 className="cta-title elegant-heading text-3xl md:text-4xl mb-8">欢迎加入我们</h2>
 
-        <ScrollReveal delay={0.2}>
-          <motion.p
-            className="elegant-body text-lg mb-12 leading-relaxed"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            我们正在寻找优秀的本科生、研究生和博士生加入我们的团队，
-            共同探索前沿技术，开展创新性研究。
-          </motion.p>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.4}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <Link
-              href="/contact"
-              className="elegant-button bg-white text-primary-charcoal border-white hover:bg-transparent hover:text-white inline-block"
+            <motion.p
+              className="text text-white text-lg mb-12 leading-relaxed max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
-              联系我们
-            </Link>
+              团队每年招收博士研究生1名，硕士研究生15名左右，欢迎感兴趣的同学与我们联系！！
+            </motion.p>
+
+            <motion.div
+              className="link"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <Link
+                href="/contact"
+                className="theme-btn slide-btn-one bg-white text-black px-8 py-3 rounded hover:bg-gray-100 transition-colors inline-block font-medium"
+              >
+                联系我们
+              </Link>
+            </motion.div>
           </motion.div>
         </ScrollReveal>
       </div>
@@ -362,38 +376,33 @@ function JoinUs() {
   );
 }
 
-// 团队建设组件 - 横向滚动设计
+// 团队建设组件 - 匹配旧HTML设计
 function TeamBuilding() {
   const activities = [
     {
       title: "2019绍兴团建",
-      date: "2019-09",
+      date: "on 2 Sep, 2018",
       image: "/images/resource/news-1.jpg"
     },
     {
       title: "2020年会",
-      date: "2020-10",
+      date: "on 20 Oct, 2020",
       image: "/images/resource/news-2.jpg"
     },
     {
       title: "2020中秋聚餐",
-      date: "2020-11",
+      date: "on 25 Nov, 2020",
       image: "/images/resource/news-3.jpg"
     },
     {
       title: "2020暑期团建",
-      date: "2020-07",
+      date: "on 25 Nov, 2020",
       image: "/images/resource/news-4.jpg"
     },
     {
-      title: "华为软件精英挑战赛",
-      date: "2024-11",
+      title: "2024年华为软件精英挑战赛",
+      date: "on 25 Nov, 2025",
       image: "/images/resource/news-huawei.jpg"
-    },
-    {
-      title: "学术报告",
-      date: "2024-01",
-      image: "/images/resource/news-5.jpg"
     }
   ];
 
@@ -463,72 +472,73 @@ function TeamBuilding() {
   };
 
   return (
-    <section className="py-24 bg-warm">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="news-section py-24 bg-gray-50">
+      <div className="container mx-auto px-6">
         <ScrollReveal className="text-center mb-16">
-          <motion.h2
-            className="elegant-heading text-3xl md:text-4xl mb-6"
+          <motion.div
+            className="title-box"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            团队建设
-          </motion.h2>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-secondary-slate to-transparent mx-auto mb-8"></div>
-          <p className="elegant-subheading text-lg">Team Building</p>
+            <h2 className="sec-title elegant-heading text-3xl md:text-4xl mb-4">团队建设</h2>
+            <p className="title-text elegant-subheading text-lg text-secondary-slate">Team Building</p>
+          </motion.div>
         </ScrollReveal>
 
-        <div
-          ref={scrollRef}
-          className="overflow-x-auto pb-4 scrollbar-hide"
-          style={{
-            scrollbarWidth: 'none', // Firefox
-            msOverflowStyle: 'none', // IE and Edge
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <style jsx>{`
-            .scrollbar-hide::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-          <div className="flex space-x-6 min-w-max px-2">
-            {activities.map((activity, index) => (
-              <ScrollReveal key={index} delay={index * 0.1}>
-                <motion.div
-                  className="flex-shrink-0 w-80 bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  whileHover={{
-                    scale: 1.05,
-                    transition: { duration: 0.3 }
-                  }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <div className="relative h-48">
-                    <Image
-                      src={activity.image}
-                      alt={activity.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-medium text-primary-charcoal mb-2 leading-tight">
-                      {activity.title}
-                    </h3>
-                    <div className="flex items-center text-text-muted text-sm">
-                      <span>{activity.date}</span>
+        <div className="news-content">
+          <div
+            ref={scrollRef}
+            className="three-column-carousel overflow-x-auto pb-4 scrollbar-hide"
+            style={{
+              scrollbarWidth: 'none', // Firefox
+              msOverflowStyle: 'none', // IE and Edge
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <style jsx>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            <div className="flex space-x-6 min-w-max px-2">
+              {activities.map((activity, index) => (
+                <ScrollReveal key={index} delay={index * 0.1}>
+                  <motion.div
+                    className="single-news-content flex-shrink-0 w-80 bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    whileHover={{
+                      scale: 1.05,
+                      transition: { duration: 0.3 }
+                    }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <figure className="image-box relative h-48">
+                      <Image
+                        src={activity.image}
+                        alt={activity.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </figure>
+                    <div className="content-box p-6" style={{ opacity: 0.6 }}>
+                      <h5 className="text-lg font-medium text-primary-charcoal mb-2 leading-tight">
+                        {activity.title}
+                      </h5>
+                      <ul className="info-content">
+                        <li className="text-text-muted text-sm">{activity.date}</li>
+                      </ul>
                     </div>
-                  </div>
-                </motion.div>
-              </ScrollReveal>
-            ))}
+                  </motion.div>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -541,8 +551,7 @@ export default function Home() {
     <div>
       <Carousel />
       <LabIntro />
-      <RecentPapers />
-      <LatestNews />
+      <EventSection />
       <JoinUs />
       <TeamBuilding />
     </div>
