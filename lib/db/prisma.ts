@@ -1,14 +1,16 @@
-import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
 declare global {
   // allow global `var` declarations
   // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+  var prisma: any | undefined;
 }
 
-let prisma: PrismaClient;
+let prisma: any;
+
+// Use require to avoid import issues
+const { PrismaClient } = require('@prisma/client');
 
 if (process.env.NODE_ENV === 'production') {
   // In production (serverless), use the adapter

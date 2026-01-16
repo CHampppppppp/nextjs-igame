@@ -104,7 +104,7 @@ export async function getAllStudents(): Promise<StudentRecord[]> {
       ],
     });
 
-    return students.map(student => ({
+    return students.map((student: any) => ({
       id: student.id,
       chineseName: student.chineseName,
       englishName: student.englishName || undefined,
@@ -140,7 +140,7 @@ export async function getStudentsByGrade(grade: string): Promise<StudentRecord[]
       orderBy: { chineseName: 'asc' },
     });
 
-    return students.map(student => ({
+    return students.map((student: any) => ({
       id: student.id,
       chineseName: student.chineseName,
       englishName: student.englishName || undefined,
@@ -236,7 +236,7 @@ export async function searchStudents(searchTerm: string): Promise<StudentRecord[
       ],
     });
 
-    return students.map(student => ({
+    return students.map((student: any) => ({
       id: student.id,
       chineseName: student.chineseName,
       englishName: student.englishName || undefined,
