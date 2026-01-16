@@ -67,6 +67,24 @@ const contactInfo = {
   website: "http://igame.hdu.edu.cn"
 };
 
+// 将文化与申请方式转换为 RecruitmentCard 接受的结构
+const cultureCardInfo = {
+  title: recruitmentInfo.culture.title,
+  requirements: recruitmentInfo.culture.items.map((it) => ({
+    label: it.title,
+    content: it.content
+  }))
+};
+
+const applicationCardInfo = {
+  title: "申请方式",
+  requirements: [
+    { label: "发送简历", content: "将简历发送至实验室邮箱" },
+    { label: "联系导师", content: "直接与意向导师取得联系" },
+    { label: "学校招生", content: "参加学校研究生统一招生" }
+  ]
+};
+
 // 招聘卡片组件
 function RecruitmentCard({ info }: { info: typeof recruitmentInfo.faculty }) {
   return (
@@ -122,94 +140,17 @@ export default function ContactPage() {
                 <h2 className="elegant-heading text-3xl mb-4">招聘信息</h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 ">
                 <RecruitmentCard info={recruitmentInfo.faculty} />
                 <RecruitmentCard info={recruitmentInfo.graduate} />
 
-                {/* 人才培养制度 */}
-                <div className="content-block rounded-lg p-6">
-                  <div className="inner-title mb-4 flex items-center">
-                    <i className="bi bi-people mr-3 text-accent-blue text-2xl"></i>
-                    <h3 className="text-2xl font-semibold text-primary-charcoal">人才培养</h3>
-                  </div>
-                  <div className="text-text-muted space-y-3">
-                    {recruitmentInfo.culture.items.map((item, index) => (
-                      <div key={index} className="mb-4">
-                        <h4 className="font-medium text-primary-charcoal mb-2 flex items-center">
-                          <span className="text-2xl mr-2">{item.icon}</span>
-                          {item.title}
-                        </h4>
-                        <ul className="space-y-2 ml-6 text-text-muted">
-                          {item.content.split('；').filter(s => s.trim()).map((point, idx) => (
-                            <li key={idx} className="flex items-start">
-                              <i className="bi bi-speedometer2 mr-2 mt-1 text-accent-blue"></i>
-                              <span>{point.trim()}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {/* 人才培养制度（使用 RecruitmentCard 形式） */}
+                <RecruitmentCard info={cultureCardInfo} />
               </div>
             </section>
 
-            {/* 人才培养制度区域 */}
-            <section>
-              <div className="text-center mb-6">
-                <h2 className="elegant-heading text-3xl mb-4">人才培养制度</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {recruitmentInfo.culture.items.map((item, index) => (
-                  <CultureCard key={index} item={item} />
-                ))}
-              </div>
-            </section>
-
-            {/* 申请方式 */}
-            <section className="content-block rounded-lg p-6">
-              <div className="text-center">
-                <h2 className="text-3xl font-semibold mb-6">申请方式</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">📧</span>
-                    </div>
-                    <h3 className="font-medium mb-2">发送简历</h3>
-                    <p className="text-sm text-text-muted">将简历发送至实验室邮箱</p>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">💬</span>
-                    </div>
-                    <h3 className="font-medium mb-2">联系导师</h3>
-                    <p className="text-sm text-text-muted">直接与意向导师取得联系</p>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">🏫</span>
-                    </div>
-                    <h3 className="font-medium mb-2">学校招生</h3>
-                    <p className="text-sm text-text-muted">参加学校研究生统一招生</p>
-                  </div>
-                </div>
-
-                <div className="text-center">
-                  <p className="text-lg text-primary-charcoal mb-4">
-                    我们期待您的加入，共同创造美好的未来！
-                  </p>
-                  <Link
-                    href="/"
-                    className="accent-button"
-                  >
-                    返回主页
-                  </Link>
-                </div>
-              </div>
-            </section>
+            {/* 申请方式（使用 RecruitmentCard 形式） */}
+            <RecruitmentCard info={applicationCardInfo} />
           </div>
 
           {/* 侧边栏 已移除，联系信息已整合到页脚 */}

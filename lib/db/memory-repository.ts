@@ -1,4 +1,4 @@
-import { query } from './mysql';
+import { prisma } from './prisma';
 
 // 记忆文档接口
 export interface MemoryDocumentRecord {
@@ -18,32 +18,24 @@ export interface MemoryDocumentRecord {
 // 创建记忆文档记录
 export async function createMemoryDocument(doc: Omit<MemoryDocumentRecord, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<string> {
   try {
-    const id = `mem_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const memoryDoc = await prisma.memoryDocument.create({
+      data: {
+        title: doc.title,
+        content: doc.content,
+        type: doc.type,
+        fileName: doc.fileName,
+        chunkIndex: doc.chunkIndex,
+        totalChunks: doc.totalChunks,
+        pineconeId: doc.pineconeId,
+        status: 'active',
+      },
+    });
 
-    const sql = `
-      INSERT INTO memory_documents (
-        id, title, content, type, file_name, chunk_index, total_chunks,
-        created_at, updated_at, pinecone_id, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, 'active')
-    `;
-
-    const params = [
-      id,
-      doc.title,
-      doc.content,
-      doc.type,
-      doc.fileName,
-      doc.chunkIndex,
-      doc.totalChunks,
-      doc.pineconeId
-    ];
-
-    await query(sql, params);
-    console.log(`Memory document created in database: ${id}`);
-    return id;
+    console.log(`Memory document created in database: ${memoryDoc.id}`);
+    return memoryDoc.id;
   } catch (error) {
     // 如果数据库不可用，记录警告但不抛出错误
-    console.warn('MySQL database unavailable for createMemoryDocument:', error instanceof Error ? error.message : 'Unknown error');
+    console.warn('Database unavailable for createMemoryDocument:', error instanceof Error ? error.message : 'Unknown error');
     // 返回一个虚拟ID表示保存失败，但不影响Pinecone保存
     return `db_unavailable_${Date.now()}`;
   }
@@ -52,56 +44,59 @@ export async function createMemoryDocument(doc: Omit<MemoryDocumentRecord, 'id' 
 // 获取所有记忆文档
 export async function getAllMemoryDocuments(): Promise<MemoryDocumentRecord[]> {
   try {
-    const sql = `
-      SELECT
-        id, title, content, type, file_name as fileName,
-        chunk_index as chunkIndex, total_chunks as totalChunks,
-        created_at as createdAt, updated_at as updatedAt,
-        pinecone_id as pineconeId, status
-      FROM memory_documents
-      WHERE status = 'active'
-      ORDER BY created_at DESC
-    `;
+    const documents = await prisma.memoryDocument.findMany({
+      where: { status: 'active' },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    const rows = await query(sql);
-
-    // 转换日期字符串为Date对象
-    return rows.map((row: any) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+    return documents.map(doc => ({
+      id: doc.id,
+      title: doc.title,
+      content: doc.content,
+      type: doc.type,
+      fileName: doc.fileName || undefined,
+      chunkIndex: doc.chunkIndex,
+      totalChunks: doc.totalChunks,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+      pineconeId: doc.pineconeId,
+      status: doc.status,
     }));
   } catch (error) {
     // 如果数据库不可用，返回空数组，让调用方处理降级
-    console.warn('MySQL database unavailable for getAllMemoryDocuments:', error instanceof Error ? error.message : 'Unknown error');
+    console.warn('Database unavailable for getAllMemoryDocuments:', error instanceof Error ? error.message : 'Unknown error');
     return [];
   }
 }
 
 // 根据ID获取记忆文档
 export async function getMemoryDocumentById(id: string): Promise<MemoryDocumentRecord | null> {
-  const sql = `
-    SELECT
-      id, title, content, type, file_name as fileName,
-      chunk_index as chunkIndex, total_chunks as totalChunks,
-      created_at as createdAt, updated_at as updatedAt,
-      pinecone_id as pineconeId, status
-    FROM memory_documents
-    WHERE id = ? AND status = 'active'
-  `;
+  try {
+    const document = await prisma.memoryDocument.findUnique({
+      where: { id, status: 'active' },
+    });
 
-  const rows = await query(sql, [id]);
+    if (!document) {
+      return null;
+    }
 
-  if (rows.length === 0) {
+    return {
+      id: document.id,
+      title: document.title,
+      content: document.content,
+      type: document.type,
+      fileName: document.fileName || undefined,
+      chunkIndex: document.chunkIndex,
+      totalChunks: document.totalChunks,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+      pineconeId: document.pineconeId,
+      status: document.status,
+    };
+  } catch (error) {
+    console.warn('Database unavailable for getMemoryDocumentById:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
-
-  const row = rows[0];
-  return {
-    ...row,
-    createdAt: new Date(row.createdAt),
-    updatedAt: new Date(row.updatedAt),
-  };
 }
 
 // 根据Pinecone ID获取记忆文档
@@ -133,16 +128,12 @@ export async function getMemoryDocumentByPineconeId(pineconeId: string): Promise
 // 删除记忆文档（软删除）
 export async function deleteMemoryDocument(id: string): Promise<boolean> {
   try {
-    const sql = `
-      UPDATE memory_documents
-      SET status = 'deleted', updated_at = NOW()
-      WHERE id = ?
-    `;
+    const result = await prisma.memoryDocument.update({
+      where: { id },
+      data: { status: 'deleted' },
+    });
 
-    const result = await query(sql, [id]);
-    const affectedRows = (result as any).affectedRows || 0;
-
-    if (affectedRows > 0) {
+    if (result) {
       console.log(`Memory document marked as deleted: ${id}`);
       return true;
     }
@@ -150,7 +141,7 @@ export async function deleteMemoryDocument(id: string): Promise<boolean> {
     return false;
   } catch (error) {
     // 如果数据库不可用，记录警告但返回false（表示删除失败）
-    console.warn('MySQL database unavailable for deleteMemoryDocument:', error instanceof Error ? error.message : 'Unknown error');
+    console.warn('Database unavailable for deleteMemoryDocument:', error instanceof Error ? error.message : 'Unknown error');
     return false;
   }
 }

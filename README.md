@@ -127,22 +127,38 @@ PINECONE_INDEX_NAME=igame-lab-memory
 
 ### 数据库设置
 
-#### Linux/macOS 自动设置
-```bash
-# 设置数据库密码（根据需要修改）
-export DB_PASSWORD=your_mysql_password
+#### Neon PostgreSQL 数据库设置
 
-# 运行自动化脚本
-npm run setup-db
+**1. 创建 Neon 账户**
+1. 访问 [Neon Console](https://console.neon.tech/)
+2. 使用 GitHub 账户注册或创建新账户
+3. 创建新项目
+
+**2. 获取数据库连接信息**
+在 Neon 控制台中：
+- 点击项目进入数据库详情
+- 复制 "Connection string"（包含密码的完整连接字符串）
+- 格式类似：`postgresql://username:password@hostname/dbname?sslmode=require`
+
+**3. 配置环境变量**
+```bash
+# 复制环境变量模板
+cp env.example .env.local
+
+# 编辑 .env.local 文件
+DATABASE_URL="your_neon_connection_string_here"
 ```
 
-#### Windows 自动设置
-```powershell
-# 使用 PowerShell 脚本（推荐）
-.\scripts\setup-database-windows.ps1 -DB_PASSWORD your_mysql_password
+**4. 初始化数据库**
+```bash
+# 推送 schema 到数据库
+npm run db:push
 
-# 或使用 npm 脚本
-npm run setup-db-windows
+# 或者创建迁移（推荐用于生产环境）
+npm run db:migrate
+
+# 验证数据库连接
+npm run init-db
 ```
 
 #### Windows 手动设置

@@ -1,4 +1,4 @@
-import { query } from './mysql';
+import { prisma } from './prisma';
 
 // 学生信息接口
 export interface StudentRecord {
@@ -25,24 +25,27 @@ export interface StudentRecord {
 // 创建学生记录
 export async function createStudent(student: Omit<StudentRecord, 'createdAt' | 'updatedAt'>): Promise<string> {
   try {
-    const sql = `
-      INSERT INTO students (
-        id, chinese_name, english_name, grade, degree, research, bio,
-        email, phone, avatar, github, linkedin, website, skills,
-        interests, publications, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, '', ?, '', '', '', '', '', '', '', '', '', NOW(), NOW())
-    `;
+    const newStudent = await prisma.student.create({
+      data: {
+        id: student.id,
+        chineseName: student.chineseName,
+        englishName: student.englishName,
+        grade: student.grade,
+        degree: student.degree,
+        research: student.research || '',
+        bio: student.bio,
+        email: student.email || '',
+        phone: student.phone || '',
+        avatar: student.avatar || '',
+        github: student.github || '',
+        linkedin: student.linkedin || '',
+        website: student.website || '',
+        skills: student.skills || '',
+        interests: student.interests || '',
+        publications: student.publications || '',
+      },
+    });
 
-    const params = [
-      student.id,
-      student.chineseName,
-      student.englishName || null,
-      student.grade,
-      student.degree,
-      student.bio,
-    ];
-
-    await query(sql, params);
     console.log(`Student record created: ${student.id}`);
     return student.id;
   } catch (error) {
@@ -56,27 +59,33 @@ export async function createStudent(student: Omit<StudentRecord, 'createdAt' | '
 // 根据ID获取学生信息
 export async function getStudentById(id: string): Promise<StudentRecord | null> {
   try {
-    const sql = `
-      SELECT
-        id, chinese_name as chineseName, english_name as englishName,
-        grade, degree, research, bio, email, phone, avatar, github,
-        linkedin, website, skills, interests, publications,
-        created_at as createdAt, updated_at as updatedAt
-      FROM students
-      WHERE id = ?
-    `;
+    const student = await prisma.student.findUnique({
+      where: { id },
+    });
 
-    const rows = await query(sql, [id]);
-
-    if (rows.length === 0) {
+    if (!student) {
       return null;
     }
 
-    const row = rows[0];
     return {
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+      id: student.id,
+      chineseName: student.chineseName,
+      englishName: student.englishName || undefined,
+      grade: student.grade,
+      degree: student.degree,
+      research: student.research || undefined,
+      bio: student.bio || undefined,
+      email: student.email || undefined,
+      phone: student.phone || undefined,
+      avatar: student.avatar || undefined,
+      github: student.github || undefined,
+      linkedin: student.linkedin || undefined,
+      website: student.website || undefined,
+      skills: student.skills || undefined,
+      interests: student.interests || undefined,
+      publications: student.publications || undefined,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     };
   } catch (error) {
     // 如果数据库不可用，返回null让前端处理
@@ -88,22 +97,32 @@ export async function getStudentById(id: string): Promise<StudentRecord | null> 
 // 获取所有学生信息
 export async function getAllStudents(): Promise<StudentRecord[]> {
   try {
-    const sql = `
-      SELECT
-        id, chinese_name as chineseName, english_name as englishName,
-        grade, degree, research, bio, email, phone, avatar, github,
-        linkedin, website, skills, interests, publications,
-        created_at as createdAt, updated_at as updatedAt
-      FROM students
-      ORDER BY grade DESC, chinese_name ASC
-    `;
+    const students = await prisma.student.findMany({
+      orderBy: [
+        { grade: 'desc' },
+        { chineseName: 'asc' },
+      ],
+    });
 
-    const rows = await query(sql);
-
-    return rows.map((row: any) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+    return students.map(student => ({
+      id: student.id,
+      chineseName: student.chineseName,
+      englishName: student.englishName || undefined,
+      grade: student.grade,
+      degree: student.degree,
+      research: student.research || undefined,
+      bio: student.bio || undefined,
+      email: student.email || undefined,
+      phone: student.phone || undefined,
+      avatar: student.avatar || undefined,
+      github: student.github || undefined,
+      linkedin: student.linkedin || undefined,
+      website: student.website || undefined,
+      skills: student.skills || undefined,
+      interests: student.interests || undefined,
+      publications: student.publications || undefined,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     }));
   } catch (error) {
     console.error('Failed to get all students:', error);
@@ -116,23 +135,30 @@ export async function getAllStudents(): Promise<StudentRecord[]> {
 // 根据年级获取学生信息
 export async function getStudentsByGrade(grade: string): Promise<StudentRecord[]> {
   try {
-    const sql = `
-      SELECT
-        id, chinese_name as chineseName, english_name as englishName,
-        grade, degree, research, bio, email, phone, avatar, github,
-        linkedin, website, skills, interests, publications,
-        created_at as createdAt, updated_at as updatedAt
-      FROM students
-      WHERE grade = ?
-      ORDER BY chinese_name ASC
-    `;
+    const students = await prisma.student.findMany({
+      where: { grade },
+      orderBy: { chineseName: 'asc' },
+    });
 
-    const rows = await query(sql, [grade]);
-
-    return rows.map((row: any) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+    return students.map(student => ({
+      id: student.id,
+      chineseName: student.chineseName,
+      englishName: student.englishName || undefined,
+      grade: student.grade,
+      degree: student.degree,
+      research: student.research || undefined,
+      bio: student.bio || undefined,
+      email: student.email || undefined,
+      phone: student.phone || undefined,
+      avatar: student.avatar || undefined,
+      github: student.github || undefined,
+      linkedin: student.linkedin || undefined,
+      website: student.website || undefined,
+      skills: student.skills || undefined,
+      interests: student.interests || undefined,
+      publications: student.publications || undefined,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     }));
   } catch (error) {
     console.error('Failed to get students by grade:', error);
@@ -145,25 +171,30 @@ export async function getStudentsByGrade(grade: string): Promise<StudentRecord[]
 // 更新学生信息
 export async function updateStudent(id: string, updates: Partial<Omit<StudentRecord, 'id' | 'createdAt' | 'updatedAt'>>): Promise<boolean> {
   try {
-    const sql = `
-      UPDATE students
-      SET chinese_name = ?, english_name = ?, grade = ?, degree = ?, bio = ?, updated_at = NOW()
-      WHERE id = ?
-    `;
+    const updateData: any = {};
 
-    const params = [
-      updates.chineseName,
-      updates.englishName || null,
-      updates.grade,
-      updates.degree,
-      updates.bio,
-      id,
-    ];
+    if (updates.chineseName !== undefined) updateData.chineseName = updates.chineseName;
+    if (updates.englishName !== undefined) updateData.englishName = updates.englishName;
+    if (updates.grade !== undefined) updateData.grade = updates.grade;
+    if (updates.degree !== undefined) updateData.degree = updates.degree;
+    if (updates.research !== undefined) updateData.research = updates.research;
+    if (updates.bio !== undefined) updateData.bio = updates.bio;
+    if (updates.email !== undefined) updateData.email = updates.email;
+    if (updates.phone !== undefined) updateData.phone = updates.phone;
+    if (updates.avatar !== undefined) updateData.avatar = updates.avatar;
+    if (updates.github !== undefined) updateData.github = updates.github;
+    if (updates.linkedin !== undefined) updateData.linkedin = updates.linkedin;
+    if (updates.website !== undefined) updateData.website = updates.website;
+    if (updates.skills !== undefined) updateData.skills = updates.skills;
+    if (updates.interests !== undefined) updateData.interests = updates.interests;
+    if (updates.publications !== undefined) updateData.publications = updates.publications;
 
-    const result = await query(sql, params);
-    const affectedRows = (result as any).affectedRows || 0;
+    const result = await prisma.student.update({
+      where: { id },
+      data: updateData,
+    });
 
-    return affectedRows > 0;
+    return !!result;
   } catch (error) {
     console.error('Failed to update student:', error);
     // 如果数据库不可用，返回false
@@ -175,11 +206,11 @@ export async function updateStudent(id: string, updates: Partial<Omit<StudentRec
 // 删除学生记录
 export async function deleteStudent(id: string): Promise<boolean> {
   try {
-    const sql = `DELETE FROM students WHERE id = ?`;
-    const result = await query(sql, [id]);
-    const affectedRows = (result as any).affectedRows || 0;
+    const result = await prisma.student.delete({
+      where: { id },
+    });
 
-    return affectedRows > 0;
+    return !!result;
   } catch (error) {
     console.error('Failed to delete student:', error);
     // 如果数据库不可用，返回false
@@ -191,24 +222,39 @@ export async function deleteStudent(id: string): Promise<boolean> {
 // 搜索学生
 export async function searchStudents(searchTerm: string): Promise<StudentRecord[]> {
   try {
-    const sql = `
-      SELECT
-        id, chinese_name as chineseName, english_name as englishName,
-        grade, degree, research, bio, email, phone, avatar, github,
-        linkedin, website, skills, interests, publications,
-        created_at as createdAt, updated_at as updatedAt
-      FROM students
-      WHERE chinese_name LIKE ? OR english_name LIKE ? OR bio LIKE ?
-      ORDER BY grade DESC, chinese_name ASC
-    `;
+    const students = await prisma.student.findMany({
+      where: {
+        OR: [
+          { chineseName: { contains: searchTerm, mode: 'insensitive' } },
+          { englishName: { contains: searchTerm, mode: 'insensitive' } },
+          { bio: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      orderBy: [
+        { grade: 'desc' },
+        { chineseName: 'asc' },
+      ],
+    });
 
-    const searchPattern = `%${searchTerm}%`;
-    const rows = await query(sql, [searchPattern, searchPattern, searchPattern]);
-
-    return rows.map((row: any) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+    return students.map(student => ({
+      id: student.id,
+      chineseName: student.chineseName,
+      englishName: student.englishName || undefined,
+      grade: student.grade,
+      degree: student.degree,
+      research: student.research || undefined,
+      bio: student.bio || undefined,
+      email: student.email || undefined,
+      phone: student.phone || undefined,
+      avatar: student.avatar || undefined,
+      github: student.github || undefined,
+      linkedin: student.linkedin || undefined,
+      website: student.website || undefined,
+      skills: student.skills || undefined,
+      interests: student.interests || undefined,
+      publications: student.publications || undefined,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     }));
   } catch (error) {
     console.error('Failed to search students:', error);

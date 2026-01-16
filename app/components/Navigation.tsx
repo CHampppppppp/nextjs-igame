@@ -25,13 +25,13 @@ export default function Navigation() {
               <Image
                 src="/images/igamelogo-blue.png"
                 alt="iGame Lab Logo"
-                width={48}
-                height={48}
+                width={320}
+                height={320}
                 className="rounded"
               />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">iGame Lab</h1>
-                <p className="text-xs text-gray-600">智能可视化与仿真实验室</p>
+                {/* <h1 className="text-sm font-medium text-gray-900">iGame Lab</h1> */}
+                {/* <p className="text-xs text-gray-600">智能可视化与仿真实验室</p> */}
               </div>
             </Link>
           </div>
@@ -58,12 +58,11 @@ export default function Navigation() {
           {/* HDU Logo */}
           <div className="flex items-center">
             <div className="text-right">
-              <div className="text-xs text-gray-500">杭州电子科技大学</div>
               <Image
                 src="/images/hdu-logo.png"
                 alt="HDU Logo"
-                width={40}
-                height={40}
+                width={160}
+                height={160}
                 className="rounded"
               />
             </div>
