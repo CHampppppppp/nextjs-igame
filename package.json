@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "create-pinecone-index": "tsx scripts/create-pinecone-index.ts",
     "init-db": "tsx scripts/init-database.ts",
     "db:studio": "npx prisma studio",
