@@ -186,7 +186,7 @@ export async function getMemoryStats(): Promise<{
     ]);
 
     const byType: Record<string, number> = {};
-    typeResults.forEach((result) => {
+    typeResults.forEach((result: any) => {
       byType[result.type] = result._count.type;
     });
 
