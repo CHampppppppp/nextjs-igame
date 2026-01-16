@@ -227,7 +227,7 @@ export default function ChatWidget() {
               <div className="flex items-center justify-between">
                 <button
                   onClick={startNewConversation}
-                  className="flex items-center space-x-1 text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-3 py-1 text-sm transition-colors"
+                  className="flex items-center space-x-1 text-white rounded-lg px-3 py-1 text-sm transition-colors"
                   title="开启新对话"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,5 +1,5 @@
 import { prisma } from './prisma';
-import { MemoryDocument } from '@prisma/client';
+import type { MemoryDocument } from '@prisma/client';
 
 // 记忆文档接口
 export interface MemoryDocumentRecord {
