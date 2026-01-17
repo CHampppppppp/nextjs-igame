@@ -135,15 +135,10 @@ export const detectIntent: ToolFunction = {
       const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
       const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1';
 
-      if (!deepseekApiKey) {
-        // 如果没有 DeepSeek API，返回保守的默认意图
-        console.warn('DeepSeek API key not configured, returning default intent');
-        return {
-          success: false,
-          intent: 'general',
-          confidence: 0.5,
-          error: 'AI model not available for intent detection'
-        };
+      if (!deepseekApiKey || deepseekApiKey === 'your_deepseek_api_key_here') {
+        // 如果没有配置 DeepSeek API，使用简单的关键词匹配作为降级方案
+        console.warn('DeepSeek API key not configured or invalid, using fallback intent detection');
+        return fallbackIntentDetection(args.message);
       }
 
       const apiUrl = `${deepseekBaseUrl}/chat/completions`;
@@ -268,4 +263,32 @@ export function formatToolsForOpenAI(): any[] {
       parameters: tool.parameters
     }
   }));
+}
+
+// 降级意图检测函数（当DeepSeek API不可用时使用）
+function fallbackIntentDetection(message: string): { success: boolean; intent: string; confidence: number; error?: string } {
+  const lowerMessage = message.toLowerCase();
+
+  // 时间查询关键词
+  const timeKeywords = ['几点', '时间', '现在', '今天', '昨天', '明天', '什么时候', 'what time', 'current time'];
+  const hasTimeKeyword = timeKeywords.some(keyword => lowerMessage.includes(keyword));
+
+  // 历史时间查询关键词
+  const historicalTimeKeywords = ['去年', '前年', '上个月', '去年', '以前', '当时', '过去', 'last year', 'ago', 'previously'];
+  const hasHistoricalKeyword = historicalTimeKeywords.some(keyword => lowerMessage.includes(keyword));
+
+  // 实验室相关关键词
+  const labKeywords = ['实验室', '教授', '徐岗', '高飞', '顾仁树', '邬海燕', '徐金兰', '许佳敏', '肖州方', '徐钢', 'igame', '智能可视化', '计算机辅助设计', '等几何分析', '计算机视觉', '机器学习', '研究方向', '团队', '成员', '论文', '项目', '活动', '新闻', '杭州电子科技大学'];
+  const hasLabKeyword = labKeywords.some(keyword => lowerMessage.includes(keyword));
+
+  // 意图判断逻辑
+  if (hasTimeKeyword && hasHistoricalKeyword) {
+    return { success: true, intent: 'historical_time_query', confidence: 0.7 };
+  } else if (hasTimeKeyword) {
+    return { success: true, intent: 'time_query', confidence: 0.8 };
+  } else if (hasLabKeyword) {
+    return { success: true, intent: 'lab_related', confidence: 0.8 };
+  } else {
+    return { success: true, intent: 'general', confidence: 0.6 };
+  }
 }

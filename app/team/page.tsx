@@ -353,7 +353,7 @@ export default function TeamPage() {
               transition={{ duration: 0.8 }}
             >
               <img src="/static/svg/teacher-svgrepo-com.svg" alt="教师" className="inline-block w-8 h-8 mr-3 mb-2" />
-              教师团队
+              教师团队 STAFFS
             </motion.h2>
             <div className="w-16 h-px bg-linear-to-r from-transparent via-secondary-slate to-transparent mx-auto"></div>
           </ScrollReveal>
@@ -378,7 +378,7 @@ export default function TeamPage() {
               transition={{ duration: 0.8 }}
             >
               <img src="/static/svg/backpack-svgrepo-com.svg" alt="研究生" className="inline-block w-8 h-8 mr-3 mb-2" />
-              研究生团队
+              学生 STUDENTS
             </motion.h2>
             <div className="w-16 h-px bg-linear-to-r from-transparent via-secondary-slate to-transparent mx-auto"></div>
           </ScrollReveal>

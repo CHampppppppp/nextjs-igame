@@ -320,7 +320,7 @@ ${context ? `相关信息：\n${context}\n\n` : ''}
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4',
         messages: [
           {
             role: 'user',
