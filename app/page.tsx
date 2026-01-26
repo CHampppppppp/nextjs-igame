@@ -25,6 +25,24 @@ function Carousel() {
       description: "汇聚多位资深教授和青年教师，致力于学术研究和人才培养",
       buttonText: "查看团队",
       buttonLink: "/team"
+    },
+    {
+      image: "/images/main-slider/3.png",
+      title: "科研成果",
+      subtitle: "前沿学术研究",
+      description: "在计算机辅助设计、等几何分析、机器学习等领域取得重要突破"
+    },
+    {
+      image: "/images/main-slider/4.png",
+      title: "人才培养",
+      subtitle: "优秀的团队成员",
+      description: "培养博士研究生和硕士研究生多名，学生在各类竞赛中屡获佳绩"
+    },
+    {
+      image: "/images/main-slider/5.png",
+      title: "学术交流",
+      subtitle: "广泛的合作网络",
+      description: "与国内外知名学者和研究机构保持深入学术交流与合作"
     }
   ];
 
