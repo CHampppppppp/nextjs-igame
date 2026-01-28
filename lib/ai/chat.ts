@@ -11,6 +11,7 @@
 
 import { ragSystem } from './rag-chain';
 import { getToolByName } from './tools';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 /**
  * 聊天消息接口
@@ -304,8 +305,9 @@ ${context ? `相关信息：\n${context}\n\n` : ''}
 
   // 直接调用OpenAI API
   private async callOpenAIAPI(prompt: string): Promise<{ text: string }> {
-    const apiBaseUrl = process.env.OPENAI_API_BASE_URL;
+    const apiBaseUrl = process.env.OPENAI_API_BASE_URL || 'https://api.openai.com/v1';
     const apiKey = process.env.OPENAI_API_KEY;
+    const proxyUrl = process.env.HTTPS_PROXY;
 
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY not configured');
@@ -313,7 +315,8 @@ ${context ? `相关信息：\n${context}\n\n` : ''}
 
     const url = `${apiBaseUrl}/chat/completions`;
 
-    const response = await fetch(url, {
+    // 配置 fetch 选项
+    const fetchOptions: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -330,7 +333,16 @@ ${context ? `相关信息：\n${context}\n\n` : ''}
         temperature: 0.7,
         max_tokens: 1000
       })
-    });
+    };
+
+    // 如果配置了代理，则使用代理
+    if (proxyUrl) {
+      // @ts-ignore - node-fetch types mismatch with native fetch agent type
+      fetchOptions.agent = new HttpsProxyAgent(proxyUrl);
+      console.log(`Using proxy: ${proxyUrl}`);
+    }
+
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       const errorText = await response.text();
